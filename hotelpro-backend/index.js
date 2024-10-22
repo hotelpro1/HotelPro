@@ -12,6 +12,7 @@ import { fileURLToPath } from "url"; // Import fileURLToPath for ES modules
 
 configDotenv();
 const app = express();
+console.log(process.env.APP_PORT);
 const port = process.env.APP_PORT || 8080; // Default to 8080 if not set
 
 // Create HTTP server with Express app
