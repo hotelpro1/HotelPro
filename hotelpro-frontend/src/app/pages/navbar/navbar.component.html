@@ -171,14 +171,22 @@
           </div>
         </div>
       </div>
-      <div class="me-2" *ngIf="userInfo?.propertyUnitId">
-        <select id="options" [(ngModel)]="userInfo.propertyUnitId" class="form-control" style="appearance: auto"
-          (change)="switchPropertyUnit()">
-          <option *ngFor="let item of userInfo.propertyUnits" [value]="item._id">
-            {{ item.propertyUnitName }}({{ item.propertyUnitCode }})
-          </option>
-        </select>
-      </div>
+      @if(userInfo?.userType == "client") {
+        <div class="me-2" *ngIf="userInfo?.propertyUnitId">
+          <select id="options" [(ngModel)]="userInfo.propertyUnitId" class="form-control" style="appearance: auto"
+            (change)="switchPropertyUnit()">
+            <option *ngFor="let item of userInfo.propertyUnits" [value]="item._id">
+              {{ item.propertyUnitName }}({{ item.propertyUnitCode }})
+            </option>
+          </select>
+        </div>
+      }
+      @if(userInfo?.userType == "frontdesk") {
+        <div class="me-2" *ngIf="userInfo?.propertyUnitId">
+          {{ userInfo?.propertyUnitName }}({{ userInfo?.propertyUnitCode }})
+        </div>
+      }
+      
       <form class="d-flex" role="search">
         <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
         <button class="btn btn-outline-success" type="submit">Search</button>
