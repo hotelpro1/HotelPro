@@ -223,9 +223,9 @@ export class RoomMaintenanceComponent implements OnInit {
   setBackground(r: any) {
     if (r.reservationStatus == 'reserved') {
       return 'reservation';
-    } else if (r.ReservationStatus == 'inhouse') {
+    } else if (r.reservationStatus == 'inhouse') {
       return 'inhouse';
-    } else if (r.ReservationStatus == 'checkedout') {
+    } else if (r.reservationStatus == 'checkedout') {
       return 'checkedout';
     }
     return '';

@@ -182,6 +182,7 @@ const updateUser = asyncHandler(async (req, res) => {
   user.email = email;
   user.phone = phone;
   if (
+    propertyUnits.length != 0 &&
     user.propertyUnitId &&
     !propertyUnits.includes(user.propertyUnitId.toString())
   ) {

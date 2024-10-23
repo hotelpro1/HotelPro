@@ -106,7 +106,36 @@
   font-size: 14px;
 }
 
+.global_table td:nth-child(-n+3),
+.global_table th:nth-child(-n+3) {
+  position: sticky !important;
+  min-width: 115px !important;
+  width: 115px !important;
+  max-width: 115px !important;
+}
+
+.global_table td:nth-child(1),
+.global_table th:nth-child(1) {
+  left: 0 !important;
+}
+
+.global_table td:nth-child(2),
+.global_table th:nth-child(2) {
+  left: 115px !important;
+}
+
+.global_table td:nth-child(3),
+.global_table th:nth-child(3) {
+  left: 230px !important;
+}
+
+.global_table td:nth-child(-n+3) {
+  background: #fff !important;
+}
+
+
 @media only screen and (max-width: 590px) {
+
   .clean,
   .dirty {
     column-width: 15px;

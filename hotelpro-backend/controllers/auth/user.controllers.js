@@ -260,10 +260,10 @@ const loginUser = asyncHandler(async (req, res) => {
       loggedInUser[0].propertyUnitId = hasProperty._id;
     } else {
       loggedInUser[0].propertyUnitCode =
-        loggedInUser[0].propertyUnits[0].propertyUnitCode;
+        loggedInUser[0].propertyUnits[0]?.propertyUnitCode;
       loggedInUser[0].propertyUnitName =
-        loggedInUser[0].propertyUnits[0].propertyUnitName;
-      loggedInUser[0].propertyUnitId = loggedInUser[0].propertyUnits[0]._id;
+        loggedInUser[0].propertyUnits[0]?.propertyUnitName;
+      loggedInUser[0].propertyUnitId = loggedInUser[0].propertyUnits[0]?._id;
     }
   } else if (user.userType == UserTypesEnum.MANAGER) {
     loggedInUser = await User.aggregate([

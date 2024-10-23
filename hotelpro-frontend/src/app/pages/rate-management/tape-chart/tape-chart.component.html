@@ -1,5 +1,5 @@
 <div class="p-2" style="background-color: #f1f8ff">
-    <div class="mx-3 d-flex mt-4 bg-white">
+    <div class="mx-3 d-flex mt-2 bg-white">
         <div class="w-100 d-flex mx-3 justify-content-between">
             <div class="d-flex my-2 align-items-center">
                 <div class="black_font">Start Date :</div>
@@ -64,19 +64,19 @@
         </div>
     </div>
 
-    <div class="mx-3 mt-4 inline2 pb-3">
+    <div class="mx-3 mt-2 inline2">
         <div class="col-12 pl-0">
             <div style="
               overflow-x: auto;
               border-right: 1px solid rgba(0, 0, 0, 0.1);
-              max-height: 600px !important;
+              max-height: 430px !important;
             " id="scroll">
                 <table class="table-bordered global_table" style="overflow-x: hidden !important">
                     <thead>
-                        <th style="z-index: 101">Room Type</th>
-                        <th style="z-index: 101">Room</th>
-                        <th style="z-index: 101">Condition</th>
-                        <th *ngFor="let item of DateArr; let i = index">
+                        <th style="z-index: 4">Room Type</th>
+                        <th style="z-index: 4">Room</th>
+                        <th style="z-index: 4">Condition</th>
+                        <th style="z-index: 3" *ngFor="let item of DateArr; let i = index">
                             {{ item | date : "dd MMM" }} <br>
                         </th>
                     </thead>
@@ -84,9 +84,9 @@
                         <ng-container *ngFor="let item of RoomData; let i = index">
                             <ng-container *ngFor="let room of item.roomDetails; let j = index">
                                 <tr *ngIf="item.Show">
-                                    <td style="z-index: 10">{{ item.roomTypeName }}</td>
-                                    <td style="z-index: 10">{{ room.roomName }}</td>
-                                    <td style="z-index: 10">
+                                    <td style="z-index: 3">{{ item.roomTypeName }}</td>
+                                    <td style="z-index: 3">{{ room.roomName }}</td>
+                                    <td style="z-index: 3">
                                         <div class="d-flex justify-content-center">
                                             <div class="clean px-2"
                                                 [ngClass]="{ clean_active: room.roomCondition == 'clean' }">
@@ -113,9 +113,8 @@
                                           'width:' + nightNumber(r.arrival, r.departure) * 100 + 'px;'
                                         " [class]="'' + setBackground(r)">
                                                             <div class="d-flex">
-                                                                <div class="col d-flex justify-content-center"
-                                                                    style="z-index: 0 !important">
-                                                                    <div style="margin-left: -10px !important"
+                                                                <div class="col d-flex justify-content-center text-truncate">
+                                                                    <div style="margin-left: 4px !important;"
                                                                         class="text-truncate">
                                                                         {{ r.guestName }}
                                                                     </div>

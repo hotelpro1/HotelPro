@@ -1,5 +1,5 @@
 <div class="p-2" style="background-color: #f1f8ff">
-  <div class="mx-3 inline1 mt-4 bg-white">
+  <div class="mx-3 inline1 mt-2 bg-white">
     <div class="col-12 inline justify-content-center">
       <div class="inline1 my-2">
         <div class="black_font mt-2">Start Date :</div>
@@ -88,13 +88,13 @@
       </div>
     </div>
   </div>
-  <div class="mx-3 mt-4 inline2 pb-3">
+  <div class="mx-3 mt-2 inline2 pb-3">
     <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12 pl-0">
       <div
         style="
           overflow-x: auto;
           border-right: 1px solid rgba(0, 0, 0, 0.1);
-          max-height: 600px !important;
+          max-height: 450px !important;
         "
         id="scroll"
       >
@@ -103,21 +103,21 @@
           style="overflow-x: hidden !important"
         >
           <thead>
-            <th style="z-index: 101">Room Type</th>
-            <th style="z-index: 101">Room</th>
-            <th style="z-index: 101">Condition</th>
-            <th *ngFor="let item of DateArr; let i = index">
+            <th style="z-index: 4">Room Type</th>
+            <th style="z-index: 4">Room</th>
+            <th style="z-index: 4">Condition</th>
+            <th style="z-index: 3" *ngFor="let item of DateArr; let i = index">
               {{ item | date : "dd MMM" }}
             </th>
           </thead>
           <tbody>
             <ng-container *ngFor="let item of RoomData; let i = index">
               <tr *ngIf="item.Show">
-                <td style="z-index: 10">{{ item.roomType }}</td>
-                <td style="z-index: 10">
+                <td style="z-index: 3">{{ item.roomType }}</td>
+                <td style="z-index: 3">
                   {{ item.roomName }}
                 </td>
-                <td style="z-index: 10">
+                <td style="z-index: 3">
                   <div class="d-flex justify-content-center">
                     <div
                       class="clean px-2"
@@ -155,14 +155,8 @@
                           [class]="'' + setBackground(r)"
                         >
                           <div class="d-flex">
-                            <div
-                              class="col d-flex justify-content-center"
-                              style="z-index: 0 !important"
-                            >
-                              <div
-                                style="margin-left: -10px !important"
-                                class="text-truncate"
-                              >
+                            <div class="col d-flex justify-content-center text-truncate">
+                              <div style="margin-left: 4px !important;" class="text-truncate">
                                 {{ r.guestName }}
                               </div>
                             </div>

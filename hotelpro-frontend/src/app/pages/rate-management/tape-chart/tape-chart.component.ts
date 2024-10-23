@@ -280,13 +280,18 @@ export class TapeChartComponent {
       if (a.roomTypeName > b.roomTypeName) {
         return 1;
       }
-      if (a.roomName < b.roomName) {
-        return -1;
-      }
-      if (a.roomName > b.roomName) {
-        return 1;
-      }
       return 0;
+    });
+    data.map((d: any) => {
+      d.roomDetails.sort((a: any, b: any) => {
+        if (a.roomName < b.roomName) {
+          return -1;
+        }
+        if (a.roomName > b.roomName) {
+          return 1;
+        }
+        return 0;
+      });
     });
 
     return data;
@@ -295,9 +300,9 @@ export class TapeChartComponent {
   setBackground(r: any) {
     if (r.reservationStatus == 'reserved') {
       return 'reservation';
-    } else if (r.ReservationStatus == 'inhouse') {
+    } else if (r.reservationStatus == 'inhouse') {
       return 'inhouse';
-    } else if (r.ReservationStatus == 'checkedout') {
+    } else if (r.reservationStatus == 'checkedout') {
       return 'checkedout';
     }
     return '';
