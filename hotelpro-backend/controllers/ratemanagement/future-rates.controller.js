@@ -37,13 +37,6 @@ const getFutureRates = asyncHandler(async (req, res) => {
                 localField: "_id",
                 foreignField: "ratePlanRoomDetailId",
                 as: "roomTypeRates",
-                pipeline: [
-                  {
-                    $match: {
-                      rateType: RateTypeEnum.BASERATE,
-                    },
-                  },
-                ],
               },
             },
             {
@@ -53,9 +46,15 @@ const getFutureRates = asyncHandler(async (req, res) => {
               },
             },
             {
-              $project: {
-                baseRate: "$roomTypeRates.baseRate",
-                roomTypeId: 1,
+              $group: {
+                _id: "$_id",
+                roomTypeRates: {
+                  $push: {
+                    rateType: "$roomTypeRates.rateType",
+                    baseRate: "$roomTypeRates.baseRate",
+                  },
+                },
+                roomTypeId: { $first: "$roomTypeId" },
               },
             },
             {
@@ -72,6 +71,54 @@ const getFutureRates = asyncHandler(async (req, res) => {
                 preserveNullAndEmptyArrays: true,
               },
             },
+            {
+              $project: {
+                roomTypeId: 1,
+                roomTypeName: "$roomType.roomTypeName",
+                baseRate: {
+                  $arrayElemAt: [
+                    {
+                      $filter: {
+                        input: "$roomTypeRates",
+                        cond: { $eq: ["$$this.rateType", "baseRate"] },
+                      },
+                    },
+                    0,
+                  ],
+                },
+                adultRate: {
+                  $arrayElemAt: [
+                    {
+                      $filter: {
+                        input: "$roomTypeRates",
+                        cond: { $eq: ["$$this.rateType", "adultRate"] },
+                      },
+                    },
+                    0,
+                  ],
+                },
+                childRate: {
+                  $arrayElemAt: [
+                    {
+                      $filter: {
+                        input: "$roomTypeRates",
+                        cond: { $eq: ["$$this.rateType", "childRate"] },
+                      },
+                    },
+                    0,
+                  ],
+                },
+              },
+            },
+            {
+              $project: {
+                roomTypeId: 1,
+                roomTypeName: 1,
+                baseRate: "$baseRate.baseRate",
+                adultRate: "$adultRate.baseRate",
+                childRate: "$childRate.baseRate",
+              },
+            },
           ],
         },
       },
@@ -82,11 +129,13 @@ const getFutureRates = asyncHandler(async (req, res) => {
       },
       {
         $project: {
-          roomTypeName: "$rateRoomTypes.roomType.roomTypeName",
+          roomTypeName: "$rateRoomTypes.roomTypeName",
           roomTypeId: {
-            $toString: "$rateRoomTypes.roomType._id",
+            $toString: "$rateRoomTypes.roomTypeId",
           },
           baseRate: "$rateRoomTypes.baseRate",
+          adultRate: "$rateRoomTypes.adultRate",
+          childRate: "$rateRoomTypes.childRate",
           ratePlanRoomRateId: "$rateRoomTypes._id",
         },
       },

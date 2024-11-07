@@ -372,13 +372,15 @@ const getDateWiseYield = async (
   propertyUnitId
 ) => {
   try {
+    let matchquerry = {
+      propertyUnitId: new ObjectId(propertyUnitId),
+      active: true,
+    };
+    if (ratePlanId) matchquerry.ratePlanSetupId = new ObjectId(ratePlanId);
     let [yieldDetails, availability] = await Promise.all([
       Yield.aggregate([
         {
-          $match: {
-            ratePlanSetupId: new ObjectId(ratePlanId),
-            active: true,
-          },
+          $match: matchquerry,
         },
         {
           $lookup: {
@@ -396,6 +398,7 @@ const getDateWiseYield = async (
         {
           $project: {
             yieldName: 1,
+            ratePlanSetupId: 1,
             roomTypeId: "$yieldDetail.roomTypeId",
             startDate: "$yieldDetail.startDate",
             endDate: "$yieldDetail.endDate",
@@ -441,6 +444,7 @@ const getDateWiseYield = async (
               obj.dateArray.push({
                 date: new Date(o.Date),
                 roomTypeId: a._id.toString(),
+                ratePlanSetupId: yd.ratePlanSetupId,
                 yieldChangeValue: yd.changeValue,
                 yieldChangeType: yd.changeType,
               });

@@ -161,7 +161,10 @@ const getRoomMaintenance = asyncHandler(async (req, res) => {
       //   });
       // }
 
-      if (s.roomId.toString() == data.Rooms[i].roomId.toString()) {
+      if (
+        !s.tentative &&
+        s.roomId.toString() == data.Rooms[i].roomId.toString()
+      ) {
         s.roomNumber = data.Rooms[i].roomNumber;
         s.roomName = data.Rooms[i].roomName;
         s.roomType = data.Rooms[i].roomType;
@@ -169,7 +172,10 @@ const getRoomMaintenance = asyncHandler(async (req, res) => {
       }
     });
     roommaintainance.forEach((s) => {
-      if (s.roomId.toString() == data.Rooms[i].roomId.toString()) {
+      if (
+        !s.tentative &&
+        s.roomId.toString() == data.Rooms[i].roomId.toString()
+      ) {
         s.roomNumber = data.Rooms[i].roomNumber;
         s.roomName = data.Rooms[i].roomName;
         s.roomType = data.Rooms[i].roomType;

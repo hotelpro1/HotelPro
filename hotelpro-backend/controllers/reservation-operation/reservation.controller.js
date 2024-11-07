@@ -48,6 +48,7 @@ import {
 } from "./room-reservation-concurrency.js";
 
 import notification from "../notification/notification.js";
+import yieldController from "../ratemanagement/yield.controller.js";
 
 // GET all reservations
 const getAllReservations = asyncHandler(async (req, res) => {
@@ -1247,20 +1248,21 @@ const readReservationRate = asyncHandler(async (req, res) => {
   let { propertyUnitId } = req.params;
   let { arrival, departure, adults, childs } = req.body;
   let nextDate = new Date(arrival);
+
   arrival = new Date(arrival);
   departure = new Date(departure);
   propertyUnitId = new ObjectId(propertyUnitId);
 
-  let [
+  // Fetch data in parallel
+  const [
     ratesData,
-    OldReservations,
-    RoomMaintainanceDetails,
-    BookingControlDetails,
+    oldReservations,
+    roomMaintenanceDetails,
+    bookingControlDetails,
+    yieldData,
   ] = await Promise.all([
     RoomType.aggregate([
-      {
-        $match: { propertyUnitId: propertyUnitId },
-      },
+      { $match: { propertyUnitId } },
       {
         $lookup: {
           from: "rooms",
@@ -1312,6 +1314,14 @@ const readReservationRate = asyncHandler(async (req, res) => {
                 as: "roomTypeRates",
               },
             },
+            {
+              $lookup: {
+                from: "rateplanroomdaterates",
+                localField: "_id",
+                foreignField: "ratePlanRoomRateId",
+                as: "dateRates",
+              },
+            },
           ],
         },
       },
@@ -1352,6 +1362,7 @@ const readReservationRate = asyncHandler(async (req, res) => {
           childOccupant: "$childOccupancy",
           images: "$images",
           rates: "$rateRoomTypes.roomTypeRates",
+          dateRates: "$rateRoomTypes.dateRates",
           roomtype: "$roomTypeName",
           totalRoom: { $size: "$rooms" },
           roomPrice: { $literal: 0 },
@@ -1363,17 +1374,15 @@ const readReservationRate = asyncHandler(async (req, res) => {
     Reservation.aggregate([
       {
         $match: {
-          $and: [
-            { departure: { $gt: arrival } },
-            { arrival: { $lt: departure } },
-            { propertyUnitId },
-            {
-              $or: [
-                { reservationStatus: ReservationStatusEnum.INHOUSE },
-                { reservationStatus: ReservationStatusEnum.RESERVED },
-              ],
-            },
-          ],
+          propertyUnitId,
+          departure: { $gt: arrival },
+          arrival: { $lt: departure },
+          reservationStatus: {
+            $in: [
+              ReservationStatusEnum.INHOUSE,
+              ReservationStatusEnum.RESERVED,
+            ],
+          },
         },
       },
       { $project: { roomId: 1, tentative: 1, roomTypeId: 1 } },
@@ -1381,29 +1390,16 @@ const readReservationRate = asyncHandler(async (req, res) => {
     RoomMaintenance.aggregate([
       {
         $match: {
-          $and: [
-            { endDate: { $gt: arrival } },
-            { startDate: { $lt: departure } },
-            { isCompleted: { $ne: true } },
-            { propertyUnitId },
-          ],
+          propertyUnitId,
+          endDate: { $gt: arrival },
+          startDate: { $lt: departure },
+          isCompleted: { $ne: true },
         },
       },
-      {
-        $lookup: {
-          from: "rooms",
-          localField: "roomId",
-          foreignField: "_id",
-          as: "RoomMaintainanceDetails",
-        },
-      },
-      { $unwind: "$RoomMaintainanceDetails" },
       {
         $group: {
           _id: null,
-          MaintainanceRoomId: {
-            $push: { $toString: "$RoomMaintainanceDetails._id" },
-          },
+          MaintainanceRoomId: { $push: { $toString: "$roomId" } },
         },
       },
     ]),
@@ -1411,12 +1407,13 @@ const readReservationRate = asyncHandler(async (req, res) => {
       propertyUnitId,
       date: { $gte: arrival, $lte: departure },
     }).lean(),
+    yieldController.getDateWiseYield(arrival, departure, "", propertyUnitId),
   ]);
 
-  RoomMaintainanceDetails = RoomMaintainanceDetails[0];
+  const maintenanceRooms = roomMaintenanceDetails[0]?.MaintainanceRoomId || [];
 
-  // Adjust room availability based on booking control
-  BookingControlDetails.forEach((b) => {
+  // Adjust room availability based on booking control, reservations, and maintenance
+  bookingControlDetails.forEach((b) => {
     if (b.soldOut && b.date >= arrival && b.date < departure) {
       ratesData.forEach((r) => {
         r.rooms = r.rooms.filter(
@@ -1427,61 +1424,68 @@ const readReservationRate = asyncHandler(async (req, res) => {
     }
   });
 
-  // Adjust room availability based on old reservations and maintenance
-  for (let i = 0; i < ratesData.length; i++) {
-    if (OldReservations.length > 0) {
-      OldReservations.forEach((r) => {
-        if (r.tentative && r.roomTypeId.equals(ratesData[i].roomTypeId)) {
-          ratesData[i].totalRoom -= 1;
-        } else {
-          const index = ratesData[i].roomId.indexOf(String(r.roomId));
-          if (index > -1 && !r.tentative) {
-            ratesData[i].rooms.splice(index, 1);
-            ratesData[i].roomId.splice(index, 1);
-            ratesData[i].totalRoom -= 1;
-          }
+  ratesData.forEach((rate) => {
+    oldReservations.forEach((res) => {
+      if (res.tentative && res.roomTypeId.equals(rate.roomTypeId)) {
+        rate.totalRoom -= 1;
+      } else {
+        const index = rate.roomId.indexOf(String(res.roomId));
+        if (index > -1 && !res.tentative) {
+          rate.rooms.splice(index, 1);
+          rate.roomId.splice(index, 1);
+          rate.totalRoom -= 1;
         }
-      });
-    }
+      }
+    });
 
-    if (RoomMaintainanceDetails?.MaintainanceRoomId.length > 0) {
-      RoomMaintainanceDetails.MaintainanceRoomId.forEach((id) => {
-        const index = ratesData[i].roomId.indexOf(id);
-        if (index > -1) {
-          ratesData[i].rooms.splice(index, 1);
-          ratesData[i].roomId.splice(index, 1);
-          ratesData[i].totalRoom -= 1;
-        }
-      });
-    }
-  }
+    maintenanceRooms.forEach((id) => {
+      const index = rate.roomId.indexOf(id);
+      if (index > -1) {
+        rate.rooms.splice(index, 1);
+        rate.roomId.splice(index, 1);
+        rate.totalRoom -= 1;
+      }
+    });
+  });
 
-  // Prepare rateType and dateRate
-  for (let roomtype of ratesData) {
-    roomtype["rateType"] = {};
-    roomtype["dateRate"] = [];
-    for (let rate of roomtype.rates) {
-      roomtype.rateType[rate.rateType] = rate.baseRate;
-    }
+  // Prepare rateType and dateRate for each room type
+  ratesData.forEach((roomtype) => {
+    roomtype.rateType = Object.fromEntries(
+      roomtype.rates.map((rate) => [rate.rateType, rate.baseRate])
+    );
+    roomtype.dateRate = [];
     delete roomtype.rates;
-  }
+  });
 
-  // Populate dateRate
-  for (let j = 0; nextDate < departure; j++) {
+  while (nextDate < departure) {
     for (let roomtype of ratesData) {
-      roomtype.rateType.date = nextDate;
-      let obj = JSON.parse(JSON.stringify(roomtype.rateType));
+      let obj = { ...roomtype.rateType, date: nextDate.toISOString() };
+      const dateRate = roomtype.dateRates.find(
+        (r) => r.date.toISOString() === nextDate.toISOString()
+      );
+      if (dateRate) obj.baseRate = dateRate.baseRate;
+
+      const yieldForRoomType = yieldData.find(
+        (y) => y.roomTypeId.toString() === roomtype.roomTypeId.toString()
+      );
+      const yieldDetails = yieldForRoomType?.dateArray.find(
+        (e) =>
+          e.ratePlanSetupId.toString() === roomtype.rateplanId.toString() &&
+          e.date.toISOString() === obj.date
+      );
+      if (yieldDetails) {
+        obj.baseRate = await yieldController.applyYield(
+          obj.baseRate,
+          yieldDetails.yieldChangeType,
+          yieldDetails.yieldChangeValue
+        );
+      }
+
       roomtype.dateRate.push(obj);
     }
     nextDate.setDate(nextDate.getDate() + 1);
   }
-  notification.sendNotification(
-    propertyUnitId,
-    [{ rate: Math.floor(100000 + Math.random() * 900000) }],
-    "Rate Change",
-    "RATE",
-    req.user
-  );
+
   return res
     .status(200)
     .json(
@@ -1512,103 +1516,167 @@ const readRateFunc = async (
       matchquerry._id = roomTypeId;
     }
 
-    let ratesData = await RoomType.aggregate([
-      { $match: matchquerry },
-      {
-        $lookup: {
-          from: "rooms",
-          localField: "_id",
-          foreignField: "roomTypeId",
-          as: "rooms",
-        },
-      },
-      {
-        $lookup: {
-          from: "taxes",
-          localField: "propertyUnitId",
-          foreignField: "propertyUnitId",
-          as: "taxes",
-        },
-      },
-      {
-        $lookup: {
-          from: "rateplanroomtypes",
-          localField: "_id",
-          foreignField: "roomTypeId",
-          as: "rateRoomTypes",
-          pipeline: [
-            {
-              $lookup: {
-                from: "rateplansetups",
-                localField: "ratePlanSetupId",
-                foreignField: "_id",
-                as: "rateSetup",
-              },
-            },
-            {
-              $unwind: { path: "$rateSetup", preserveNullAndEmptyArrays: true },
-            },
-            { $match: { "rateSetup._id": rateplanId } },
-            { $addFields: { ratePlanName: "$rateSetup.ratePlanName" } },
-            { $unset: "rateSetup" },
-            {
-              $lookup: {
-                from: "rateplanroomrates",
-                localField: "_id",
-                foreignField: "ratePlanRoomDetailId",
-                as: "roomTypeRates",
-              },
-            },
-          ],
-        },
-      },
-      { $unwind: { path: "$rateRoomTypes", preserveNullAndEmptyArrays: true } },
-      {
-        $project: {
-          _id: 0,
-          roomTypeId: "$_id",
-          rooms: {
-            $map: {
-              input: "$rooms",
-              as: "room",
-              in: {
-                id: "$$room._id",
-                roomStatus: "$$room.roomStatus",
-                roomCondition: "$$room.roomCondition",
-                roomNumber: "$$room.roomNumber",
-                roomName: "$$room.roomName",
-              },
-            },
+    let [ratesData, yieldData] = await Promise.all([
+      RoomType.aggregate([
+        { $match: matchquerry },
+        {
+          $lookup: {
+            from: "rooms",
+            localField: "_id",
+            foreignField: "roomTypeId",
+            as: "rooms",
           },
-          roomAmenities: [], // Assuming roomAmenities is an empty array for now
-          rateplanId: "$rateRoomTypes.ratePlanSetupId",
-          rateName: "$rateRoomTypes.ratePlanName",
-          adultOccupant: "$adultOccupancy",
-          childOccupant: "$childOccupancy",
-          images: "$images",
-          rates: "$rateRoomTypes.roomTypeRates",
-          roomtype: "$roomTypeName",
-          totalRoom: { $size: "$rooms" },
-          roomPrice: { $literal: 0 },
-          roomCost: { $literal: 0 },
-          taxPercentage: { $sum: "$taxes.taxPercentage" },
         },
-      },
-    ]);
+        {
+          $lookup: {
+            from: "taxes",
+            localField: "propertyUnitId",
+            foreignField: "propertyUnitId",
+            as: "taxes",
+          },
+        },
+        {
+          $lookup: {
+            from: "rateplanroomtypes",
+            localField: "_id",
+            foreignField: "roomTypeId",
+            as: "rateRoomTypes",
+            pipeline: [
+              {
+                $match: {
+                  ratePlanSetupId: rateplanId,
+                },
+              },
+              {
+                $lookup: {
+                  from: "rateplansetups",
+                  localField: "ratePlanSetupId",
+                  foreignField: "_id",
+                  as: "rateSetup",
+                },
+              },
 
-    for (let roomtype of ratesData) {
-      roomtype["rateType"] = {};
-      roomtype["dateRate"] = [];
-      for (let rate of roomtype.rates) {
-        roomtype.rateType[rate.rateType] = rate.baseRate;
-      }
-      delete roomtype.rates;
+              {
+                $unwind: {
+                  path: "$rateSetup",
+                  preserveNullAndEmptyArrays: true,
+                },
+              },
+              {
+                $addFields: { ratePlanName: "$rateSetup.ratePlanName" },
+              },
+              {
+                $unset: "rateSetup",
+              },
+              {
+                $lookup: {
+                  from: "rateplanroomrates",
+                  localField: "_id",
+                  foreignField: "ratePlanRoomDetailId",
+                  as: "roomTypeRates",
+                },
+              },
+              {
+                $lookup: {
+                  from: "rateplanroomdaterates",
+                  localField: "_id",
+                  foreignField: "ratePlanRoomRateId",
+                  as: "dateRates",
+                },
+              },
+            ],
+          },
+        },
+        {
+          $unwind: {
+            path: "$rateRoomTypes",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            roomTypeId: "$_id",
+            rooms: {
+              $map: {
+                input: "$rooms",
+                as: "room",
+                in: {
+                  id: "$$room._id",
+                  roomStatus: "$$room.roomStatus",
+                  roomCondition: "$$room.roomCondition",
+                  roomNumber: "$$room.roomNumber",
+                  roomName: "$$room.roomName",
+                },
+              },
+            },
+            roomId: {
+              $map: {
+                input: "$rooms",
+                as: "room",
+                in: { $toString: "$$room._id" },
+              },
+            },
+            roomAmenities: [], // Assuming roomAmenities is an empty array for now
+            rateplanId: "$rateRoomTypes.ratePlanSetupId",
+            rateName: "$rateRoomTypes.ratePlanName",
+            adultOccupant: "$adultOccupancy",
+            childOccupant: "$childOccupancy",
+            images: "$images",
+            rates: "$rateRoomTypes.roomTypeRates",
+            dateRates: "$rateRoomTypes.dateRates",
+            roomtype: "$roomTypeName",
+            totalRoom: { $size: "$rooms" },
+            roomPrice: { $literal: 0 },
+            roomCost: { $literal: 0 },
+            taxPercentage: { $sum: "$taxes.taxPercentage" },
+          },
+        },
+      ]),
+      yieldController.getDateWiseYield(
+        arrival,
+        departure,
+        rateplanId,
+        propertyUnitId
+      ),
+    ]);
+    if (roomTypeId) {
+      yieldData = yieldData.filter((y) => {
+        return y.roomTypeId === roomTypeId.toString();
+      });
     }
+    ratesData.forEach((roomtype) => {
+      roomtype.rateType = Object.fromEntries(
+        roomtype.rates.map((rate) => [rate.rateType, rate.baseRate])
+      );
+      roomtype.dateRate = [];
+      delete roomtype.rates;
+    });
 
     while (nextDate < departureDate) {
       for (let roomtype of ratesData) {
-        roomtype.rateType.date = nextDate;
-        let obj = JSON.parse(JSON.stringify(roomtype.rateType));
+        let obj = { ...roomtype.rateType, date: nextDate.toISOString() };
+        const dateRate = roomtype.dateRates.find(
+          (r) => r.date.toISOString() === nextDate.toISOString()
+        );
+        if (dateRate) obj.baseRate = dateRate.baseRate;
+
+        const yieldForRoomType = yieldData.find(
+          (y) => y.roomTypeId.toString() === roomtype.roomTypeId.toString()
+        );
+        const yieldDetails = yieldForRoomType?.dateArray.find(
+          (e) =>
+            e.ratePlanSetupId.toString() === roomtype.rateplanId.toString() &&
+            e.date.toISOString() === obj.date
+        );
+        if (yieldDetails) {
+          obj.baseRate = await yieldController.applyYield(
+            obj.baseRate,
+            yieldDetails.yieldChangeType,
+            yieldDetails.yieldChangeValue
+          );
+        }
+
         roomtype.dateRate.push(obj);
       }
       nextDate.setDate(nextDate.getDate() + 1);
