@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-lg bg-body-tertiary custom-bar">
   <div class="container-fluid">
-    <a class="navbar-brand" href="#">Fun World</a>
+    <a class="navbar-brand" href="#">Hotel Pro</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
       aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -10,6 +10,7 @@
         <li class="nav-item">
           <a class="nav-link active" aria-current="page" href="#">Home</a>
         </li>
+        @if(userInfo?.propertyUnitId) {
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
             Create
@@ -73,6 +74,7 @@
             <li><a class="dropdown-item" href="#">Reports</a></li>
           </ul>
         </li>
+        }
         <li class="nav-item">
           <div class="nav-link" style="cursor: pointer" (click)="openChangePassword(content)">
             Change Password
@@ -172,25 +174,25 @@
         </div>
       </div>
       @if(userInfo?.userType == "client") {
-        <div class="me-2" *ngIf="userInfo?.propertyUnitId">
-          <select id="options" [(ngModel)]="userInfo.propertyUnitId" class="form-control" style="appearance: auto"
-            (change)="switchPropertyUnit()">
-            <option *ngFor="let item of userInfo.propertyUnits" [value]="item._id">
-              {{ item.propertyUnitName }}({{ item.propertyUnitCode }})
-            </option>
-          </select>
-        </div>
+      <div class="me-2" *ngIf="userInfo?.propertyUnitId">
+        <select id="options" [(ngModel)]="userInfo.propertyUnitId" class="form-control" style="appearance: auto"
+          (change)="switchPropertyUnit()">
+          <option *ngFor="let item of userInfo.propertyUnits" [value]="item._id">
+            {{ item.propertyUnitName }}({{ item.propertyUnitCode }})
+          </option>
+        </select>
+      </div>
       }
       @if(userInfo?.userType == "frontdesk") {
-        <div class="me-2" *ngIf="userInfo?.propertyUnitId">
-          {{ userInfo?.propertyUnitName }}({{ userInfo?.propertyUnitCode }})
-        </div>
+      <div class="me-2" *ngIf="userInfo?.propertyUnitId">
+        {{ userInfo?.propertyUnitName }}({{ userInfo?.propertyUnitCode }})
+      </div>
       }
-      
-      <form class="d-flex" role="search">
+
+      <!-- <form class="d-flex" role="search">
         <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
         <button class="btn btn-outline-success" type="submit">Search</button>
-      </form>
+      </form> -->
 
       <button class="btn btn-outline-danger ms-2 border-0" type="submit" (click)="logOut()">
         Logout
