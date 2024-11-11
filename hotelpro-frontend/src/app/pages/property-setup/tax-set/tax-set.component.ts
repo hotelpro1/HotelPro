@@ -6,7 +6,7 @@ import {
   FormsModule,
   ReactiveFormsModule,
 } from '@angular/forms';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AlertService } from '../../../core/services/alert.service';
 import { CrudService } from '../../../core/services/crud.service';
@@ -31,7 +31,8 @@ export class TaxSetComponent implements OnInit {
     private crudService: CrudService,
     private alertService: AlertService,
     private activeRoute: ActivatedRoute,
-    private modalService: NgbModal
+    private modalService: NgbModal,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -61,7 +62,6 @@ export class TaxSetComponent implements OnInit {
       .then((response: any) => {
         console.log(response);
         this.allTaxes = response.data;
-        this.alertService.successAlert(response.message);
       })
       .catch((error: any) => {
         this.alertService.errorAlert(error.message);
@@ -103,5 +103,13 @@ export class TaxSetComponent implements OnInit {
           });
       }
     });
+  }
+
+  navigateToRateSetup() {
+    this.router.navigate(['/baserate-setup', this.propertyUnitId]);
+  }
+
+  goToHome() {
+    this.router.navigate(['/client-dashboard']);
   }
 }

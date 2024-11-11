@@ -75,7 +75,7 @@ export class RateplanComponent implements OnInit {
       _id: [''],
       ratePlanName: ['', Validators.required],
       ratePlanShortName: ['', Validators.required],
-      ratePlanDescription: ['', Validators.required],
+      ratePlanDescription: [''],
       isBaseRate: [false],
       active: [true],
       cancellationPolicyId: ['', Validators.required],
@@ -197,7 +197,7 @@ export class RateplanComponent implements OnInit {
       ? APIConstant.UPDATE_RATEPLAN
       : APIConstant.CREATE_RATEPLAN;
     this.generalModal
-      .openModal('Are You Sure Want submit this details ?', '')
+      .openModal('Are you sure want to submit this details?', '')
       .then((result) => {
         if (result) {
           // User confirmed
@@ -245,7 +245,6 @@ export class RateplanComponent implements OnInit {
           this.addRoomType(r);
         }
         console.log(this.ratePlanForm.value);
-        this.alertService.successAlert(response.message);
       })
       .catch((error: any) => {
         console.log(error);
@@ -337,5 +336,9 @@ export class RateplanComponent implements OnInit {
 
   next() {
     this.router.navigate(['/tax-setup', this.propertyUnitId]);
+  }
+
+  navigateToRoomSetup() {
+    this.router.navigate(['/rooms-review/' + this.propertyUnitId]);
   }
 }

@@ -171,11 +171,16 @@
               propertyUnitForm.get('propertyAddress.zipCode')?.touched) &&
             propertyUnitForm.get('propertyAddress.zipCode')?.invalid
         }" />
-      <small class="text-danger" *ngIf="
-          (propertyUnitForm.get('propertyAddress.zipCode')?.dirty ||
-            propertyUnitForm.get('propertyAddress.zipCode')?.touched) &&
-          propertyUnitForm.get('propertyAddress.zipCode')?.invalid
-        ">Zip Code is required</small>
+      <div *ngIf="
+                    propertyUnitForm.get('propertyAddress.zipCode')?.invalid &&
+                    (propertyUnitForm.get('propertyAddress.zipCode')?.dirty ||
+                      propertyUnitForm.get('propertyAddress.zipCode')?.touched)
+                  ">
+        <small class="text-danger" *ngIf="propertyUnitForm.get('propertyAddress.zipCode')?.errors?.['required']">ZIP Code is required. <br>
+        </small>
+        <small class="text-danger" *ngIf="propertyUnitForm.get('propertyAddress.zipCode')?.errors?.['zipCode']">ZIP Code must be 6-8 digits
+          long</small>
+      </div>
     </div>
     <div class="col-md-12 mt-4">
       <label class="form-label fw-semibold">Manager Details</label>
@@ -213,7 +218,7 @@
 
     <div class="col mt-3" formGroupName="managerDetails">
       <label class="form-label"> Phone</label>
-      <input type="text" class="form-control" formControlName="phone" placeholder="Enter  Phone" [ngClass]="{
+      <input type="text" class="form-control" formControlName="phone" placeholder="Enter  Phone" maxlength="10" [ngClass]="{
           'is-invalid':
             (propertyUnitForm.get('managerDetails.phone')?.dirty ||
               propertyUnitForm.get('managerDetails.phone')?.touched) &&
@@ -244,7 +249,8 @@
     <!-- Submit Button -->
     <div class="col-md-12 mt-4">
       <div class="d-flex justify-content-center">
-        <button class="btn btn-primary mb-3" type="submit">Next</button>
+        <button class="btn btn-primary mb-3" type="submit">Submit</button>
+        <button *ngIf="this.propertyUnitId != 'ADD'" class="btn btn-primary mb-3 ms-2" (click)="navigateToRoomSetup()">Next</button>
       </div>
     </div>
   </form>

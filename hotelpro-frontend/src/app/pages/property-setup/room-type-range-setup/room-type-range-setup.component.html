@@ -26,7 +26,7 @@
         >
       </div>
 
-      <div class="col mt-3">
+      <!-- <div class="col mt-3">
         <label class="form-label">Room Type Category</label>
         <input
           type="text"
@@ -49,7 +49,7 @@
           "
           >Room Type Category is required</small
         >
-      </div>
+      </div> -->
 
       <div class="col mt-3">
         <label class="form-label">Description</label>
@@ -171,12 +171,12 @@
       </div>
     </div>
     <div *ngIf="roomTypeForm.errors?.totalRoomsMismatch">
-      <p class="text-danger text-center mt-2">
-        The total number of rooms does not match the sum of the ranges.
+      <p class="text-danger mt-2">
+        Click below button to fill room details.
       </p>
     </div>
     <div *ngIf="roomTypeForm.errors?.overlappingRanges">
-      <p class="text-danger text-center mt-2">
+      <p class="text-danger mt-2">
         There are overlapping room ranges.
       </p>
     </div>
@@ -267,7 +267,10 @@
 
     <div class="col-md-12 mt-4">
       <div class="d-flex justify-content-center">
-        <button class="btn btn-primary mb-3" type="button" (click)="onSubmit()">
+        <button class="btn btn-primary mb-3" type="button" (click)="navigateToRoomReview()">
+          Cancel
+        </button>
+        <button class="btn btn-primary mb-3 ms-2" type="button" (click)="onSubmit()">
           Submit
         </button>
       </div>
