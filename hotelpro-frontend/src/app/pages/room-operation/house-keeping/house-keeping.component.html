@@ -423,7 +423,7 @@
                     <div>Contact Number*:</div>
                 </td>
                 <td>
-                    <input type="text" class="form-control" formControlName="phone" [ngClass]="{
+                    <input type="text" class="form-control" formControlName="phone" maxlength="10" [ngClass]="{
               'is-invalid':
                 (HouseKeeperForm.get('phone')?.dirty ||
                   HouseKeeperForm.get('phone')?.touched) &&

@@ -24,8 +24,7 @@ import {
 const ObjectId = mongoose.Types.ObjectId;
 
 const createHouseKeeper = asyncHandler(async (req, res) => {
-  let { propertyUnitId, firstName, lastName, email, phone, schedule } =
-    req.body;
+  let { propertyUnitId, firstName, lastName, email, phone } = req.body;
   let data = {};
 
   const existedUser = await User.findOne({
@@ -50,13 +49,13 @@ const createHouseKeeper = asyncHandler(async (req, res) => {
   };
 
   let user_details = new User(housekeeper);
-  schedule = schedule.map((s) => {
-    s.housekeeperId = user_details._id;
-    return s;
-  });
+  // schedule = schedule.map((s) => {
+  //   s.housekeeperId = user_details._id;
+  //   return s;
+  // });
 
   await Promise.all([
-    housekeeperWorkerShift.insertMany(schedule),
+    // housekeeperWorkerShift.insertMany(schedule),
     mongo.insertIntoCollection(user_details),
   ]);
   data.HouseKeeper = housekeeper;
@@ -69,20 +68,20 @@ const updateHouseKeeper = asyncHandler(async (req, res) => {
   let { _id, firstName, lastName, email, phone, schedule } = req.body;
   let data = {};
 
-  const updateWorkerShiftEntries = schedule.map((s) =>
-    mongo.bulkwriteupdateone(
-      { _id: s._id },
-      {
-        day: s.day,
-        working: s.working,
-        shiftEndTime: s.shiftEndTime,
-        shiftStartTime: s.shiftStartTime,
-      }
-    )
-  );
+  // const updateWorkerShiftEntries = schedule.map((s) =>
+  //   mongo.bulkwriteupdateone(
+  //     { _id: s._id },
+  //     {
+  //       day: s.day,
+  //       working: s.working,
+  //       shiftEndTime: s.shiftEndTime,
+  //       shiftStartTime: s.shiftStartTime,
+  //     }
+  //   )
+  // );
 
   await Promise.all([
-    housekeeperWorkerShift.bulkWrite(updateWorkerShiftEntries),
+    // housekeeperWorkerShift.bulkWrite(updateWorkerShiftEntries),
     User.findByIdAndUpdate(_id, {
       firstName,
       lastName,
