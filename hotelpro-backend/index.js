@@ -29,7 +29,7 @@ import indexRouter from "./routes/index.routes.js";
 
 //routes declaration
 app.use("/hotelpro", indexRouter);
-const distDir = path.join(__dirname, "dist"); // Use the new __dirname
+const distDir = path.join(__dirname, "dist", "browser"); // Use the new __dirname
 app.use(express.static(distDir));
 app.get("/*", (req, res) => {
   res.sendFile(path.resolve(distDir, "index.html"));
