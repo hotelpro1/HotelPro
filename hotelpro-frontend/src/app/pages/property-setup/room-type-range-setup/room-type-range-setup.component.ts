@@ -60,7 +60,7 @@ export class RoomTypeRangeSetupComponent implements OnInit {
         .then((response: any) => {
           console.log(response);
           this.roomTypeForm.reset(response.data);
-          this.alertService.successAlert(response.message);
+          // this.alertService.successAlert(response.message);
         })
         .catch((error: any) => {
           this.alertService.errorAlert(error.message);

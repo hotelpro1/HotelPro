@@ -124,7 +124,7 @@
         >
       </div>
       <div class="col mt-3" *ngIf="roomTypeId == 'ADD'">
-        <label class="form-label">Default Rate</label>
+        <label class="form-label">Default Room Rate</label>
         <input
           type="number"
           class="form-control"
@@ -145,6 +145,10 @@
           "
           >Rate is required</small
         >
+      </div>
+      <div class="col mt-3 ms-3 form-check"  *ngIf="roomTypeId != 'ADD'">
+        <input type="checkbox" class="form-check-input" formControlName="active" />
+        <label class="form-check-label">Active</label>
       </div>
       <div class="col mt-3" *ngIf="roomTypeId == 'ADD'">
         <label class="form-label">Total Rooms</label>

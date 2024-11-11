@@ -85,10 +85,11 @@
         <div class="col mt-3">
           <label class="form-label"> Phone</label>
           <input
-            type="text"
+            type="tel"
             class="form-control"
             formControlName="phone"
             placeholder="Enter  Phone"
+            maxlength="10"
             [ngClass]="{
               'is-invalid':
                 (groupForm.get('phone')?.dirty ||
