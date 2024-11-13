@@ -1079,15 +1079,15 @@ const propertyFolioSchema = new Schema(
     },
     currentFolioNumber: {
       type: Number,
-      default: 1,
+      default: 0,
     },
     currentFolioGroupNumber: {
       type: Number,
-      default: 1,
+      default: 0,
     },
     currentReceiptNumber: {
       type: Number,
-      default: 1,
+      default: 0,
     },
   },
   { timestamps: true }

@@ -185,6 +185,7 @@ export const generateTransactionReceiptNumber = async (propertyUnitId) => {
     },
     {
       returnNewDocument: true,
+      upsert: true,
     }
   );
 
@@ -203,6 +204,7 @@ export const generateGroupNumber = async (propertyUnitId) => {
     },
     {
       returnNewDocument: true,
+      upsert: true,
     }
   );
 
@@ -221,6 +223,7 @@ export const generateConfirmationNumber = async (propertyUnitId) => {
     },
     {
       returnNewDocument: true,
+      upsert: true,
     }
   );
 
