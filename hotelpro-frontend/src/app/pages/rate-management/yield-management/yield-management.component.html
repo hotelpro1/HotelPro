@@ -48,8 +48,7 @@
                                 <div class="mt-1">Start Date*:</div>
                             </td>
                             <td>
-                                <input type="date" class="form-control field" formControlName="startDate" [min]="Today"
-                                    (input)="getTomorrow()" />
+                                <input type="date" class="form-control field" formControlName="startDate" />
                                 <p class="text-danger" *ngIf="
                                   yieldForm.controls['startDate'].touched &&
                                   yieldForm.controls['startDate'].invalid
@@ -63,8 +62,7 @@
                                 <div class="mt-1">End Date*:</div>
                             </td>
                             <td>
-                                <input type="date" class="form-control field" formControlName="endDate"
-                                    [min]="Tomorrow" />
+                                <input type="date" class="form-control field" formControlName="endDate"/>
                                 <p class="text-danger" *ngIf="
                                   yieldForm.controls['endDate'].touched &&
                                   yieldForm.controls['endDate'].invalid

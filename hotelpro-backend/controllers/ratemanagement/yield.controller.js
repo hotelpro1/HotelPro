@@ -16,6 +16,9 @@ const readYield = asyncHandler(async (req, res) => {
   const { propertyUnitId } = req.body;
   let data = {};
 
+  let today = new Date();
+  today.setUTCHours(0, 0, 0, 0);
+
   [data.yieldDetails, data.roomType, data.ratePlan] = await Promise.all([
     Yield.aggregate([
       {
@@ -49,6 +52,15 @@ const readYield = asyncHandler(async (req, res) => {
           localField: "_id",
           foreignField: "yieldId",
           as: "yieldDetail",
+          pipeline: [
+            {
+              $match: {
+                endDate: {
+                  $gt: today,
+                },
+              },
+            },
+          ],
         },
       },
       {
@@ -388,6 +400,15 @@ const getDateWiseYield = async (
             localField: "_id",
             foreignField: "yieldId",
             as: "yieldDetail",
+            pipeline: [
+              {
+                $match: {
+                  endDate: {
+                    $gt: startDate,
+                  },
+                },
+              },
+            ],
           },
         },
         {
