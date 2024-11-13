@@ -53,7 +53,6 @@ const userSchema = new Schema(
     email: {
       type: String,
       required: true,
-      unique: true,
       lowercase: true,
       trim: true,
     },
@@ -103,6 +102,7 @@ const userSchema = new Schema(
 // });
 
 userSchema.methods.isPasswordCorrect = async function (password) {
+  if (!this.password) return false;
   return await bcrypt.compare(password, this.password);
 };
 
