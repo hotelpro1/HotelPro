@@ -119,27 +119,31 @@ export class FutureRatesComponent {
     if (
       new Date(this.Date).toISOString() < new Date(this.Today).toISOString()
     ) {
-      this.Date = this.Today; // if user enter past date using input
-      this.alertService.errorAlert('You can not visit past data');
+      this.Date = this.Today; // if user enters past date using input
+      this.alertService.errorAlert('You cannot visit past data');
       return;
     }
 
     this.startDate = new Date(this.Date.replace(/-/g, '/'));
+    this.startDate.setHours(0, 0, 0, 0);
     this.endDate = new Date(this.startDate);
     this.endDate.setDate(this.endDate.getDate() + this.Week * 7);
     this.DateArr = [];
     for (
       let d = new Date(this.startDate);
-      d < new Date(this.endDate);
+      d < this.endDate;
       d.setDate(d.getDate() + 1)
     ) {
       this.DateArr.push(new Date(d));
     }
 
+    const payloadStartDate = this.startDate.toLocaleDateString('en-CA'); // "yyyy-mm-dd"
+    const payloadEndDate = this.endDate.toLocaleDateString('en-CA');
+
     this.crudService
       .post(APIConstant.READ_FUTURE_RATES, {
-        startDate: this.startDate,
-        endDate: this.endDate,
+        startDate: payloadStartDate,
+        endDate: payloadEndDate,
         ratePlanId: this.RatePlanId,
         propertyUnitId: this.propertyUnitId,
       })
