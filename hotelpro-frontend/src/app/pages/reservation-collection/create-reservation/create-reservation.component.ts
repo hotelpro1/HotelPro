@@ -58,6 +58,13 @@ export class CreateReservationComponent implements OnInit {
     this.propertyUnitId = this.authService.getUserInfo()?.user?.propertyUnitId;
     // this.propertyUnitId = this.route.snapshot.paramMap.get('propertyUnitId');
     this.initForms();
+    this.clearSession();
+  }
+
+  private clearSession(): void {
+    sessionStorage.removeItem('reservationsArray');
+    sessionStorage.removeItem('groupDetails');
+    sessionStorage.removeItem('resdata');
   }
 
   private initForms(): void {
