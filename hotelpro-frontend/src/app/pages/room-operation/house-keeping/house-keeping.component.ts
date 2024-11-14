@@ -16,7 +16,6 @@ import { APIConstant } from '../../../core/constants/APIConstant';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 
-
 @Component({
   selector: 'app-house-keeping',
   standalone: true,
@@ -28,7 +27,7 @@ import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
     RouterModule,
   ],
   templateUrl: './house-keeping.component.html',
-  styleUrl: './house-keeping.component.css'
+  styleUrl: './house-keeping.component.css',
 })
 export class HouseKeepingComponent implements OnInit {
   HouseKeeperForm!: FormGroup;
@@ -78,11 +77,10 @@ export class HouseKeepingComponent implements OnInit {
     private router: Router,
     private activeRoute: ActivatedRoute,
     private modalService: NgbModal,
-    private authService: AuthService,
-  ) { }
+    private authService: AuthService
+  ) {}
 
   ngOnInit() {
-
     this.propertyUnitId = this.authService.getUserInfo()?.user?.propertyUnitId;
     this.dropDownSettings();
 
@@ -90,25 +88,25 @@ export class HouseKeepingComponent implements OnInit {
     this.HouseKeeperForm = this.fb.group({
       _id: [''],
       propertyUnitId: [this.propertyUnitId],
-      firstName: ['', [
-        Validators.required,
-        Validators.pattern("^[a-zA-Z.'\\s]*$"),
-      ]],
-      lastName: ['', [
-        Validators.required,
-        Validators.pattern("^[a-zA-Z.'\\s]*$"),
-      ]],
+      firstName: [
+        '',
+        [Validators.required, Validators.pattern("^[a-zA-Z.'\\s]*$")],
+      ],
+      lastName: [
+        '',
+        [Validators.required, Validators.pattern("^[a-zA-Z.'\\s]*$")],
+      ],
       email: ['', [Validators.required, Validators.email]],
       phone: ['', [Validators.required]],
-      schedule: this.fb.array([
-        this.createScheduleGroup('monday', true),
-        this.createScheduleGroup('tuesday', true),
-        this.createScheduleGroup('wednesday', true),
-        this.createScheduleGroup('thursday', true),
-        this.createScheduleGroup('friday', true),
-        this.createScheduleGroup('saturday', false),
-        this.createScheduleGroup('sunday', false),
-      ]),
+      // schedule: this.fb.array([
+      //   this.createScheduleGroup('monday', true),
+      //   this.createScheduleGroup('tuesday', true),
+      //   this.createScheduleGroup('wednesday', true),
+      //   this.createScheduleGroup('thursday', true),
+      //   this.createScheduleGroup('friday', true),
+      //   this.createScheduleGroup('saturday', false),
+      //   this.createScheduleGroup('sunday', false),
+      // ]),
     });
 
     this.AssignHousekeepingForm = this.fb.group({
@@ -122,15 +120,15 @@ export class HouseKeepingComponent implements OnInit {
     this.fetchData();
   }
 
-  createScheduleGroup(day: string, working: boolean): FormGroup {
-    return this.fb.group({
-      day: [day],
-      shiftStartTime: ['12:00'],
-      shiftEndTime: ['00:00'],
-      working: [working],
-      _id: [''],
-    });
-  }
+  // createScheduleGroup(day: string, working: boolean): FormGroup {
+  //   return this.fb.group({
+  //     day: [day],
+  //     shiftStartTime: ['12:00'],
+  //     shiftEndTime: ['00:00'],
+  //     working: [working],
+  //     _id: [''],
+  //   });
+  // }
 
   resetHouseKeeperForm() {
     this.HouseKeeperForm.reset(this.initialFormValues);
@@ -165,7 +163,9 @@ export class HouseKeepingComponent implements OnInit {
       .then((response: any) => {
         this.RoomDetails = response.data.RoomDetails;
         this.HouseKeeperData = response.data.housekeeperDetail;
-        this.RoomTypes = [...new Set(this.RoomDetails.map((room: any) => room.roomType))]; // Find unique room type from all rooms
+        this.RoomTypes = [
+          ...new Set(this.RoomDetails.map((room: any) => room.roomType)),
+        ]; // Find unique room type from all rooms
       })
       .catch((error) => {
         this.alertService.errorAlert(error.statusMessage);
@@ -178,66 +178,62 @@ export class HouseKeepingComponent implements OnInit {
 
   addUpdateHouseKeeper() {
     let housekeeper = this.HouseKeeperForm.value;
-    let working = false;
-    for (let s of housekeeper.schedule) {
-      if (s.working) {
-        working = true;
-      }
-      let d = new Date();
-      d.setHours(
-        s.shiftEndTime.split(':')[0],
-        s.shiftEndTime.split(':')[1],
-        0,
-        0
-      );
-      let d2 = new Date();
-      d2.setHours(
-        s.shiftStartTime.split(':')[0],
-        s.shiftStartTime.split(':')[1],
-        0,
-        0
-      );
+    // let working = false;
+    // for (let s of housekeeper.schedule) {
+    //   if (s.working) {
+    //     working = true;
+    //   }
+    //   let d = new Date();
+    //   d.setHours(
+    //     s.shiftEndTime.split(':')[0],
+    //     s.shiftEndTime.split(':')[1],
+    //     0,
+    //     0
+    //   );
+    //   let d2 = new Date();
+    //   d2.setHours(
+    //     s.shiftStartTime.split(':')[0],
+    //     s.shiftStartTime.split(':')[1],
+    //     0,
+    //     0
+    //   );
 
-      s.shiftEndTime = d.getHours() + ':' + d.getMinutes();
-      s.shiftStartTime = d2.getHours() + ':' + d2.getMinutes();
-      if (this.modalAction == 'Add') delete s._id;
-    }
-    if (working) {
-      if (this.modalAction == 'Add') {
-        this.crudService
-          .post(APIConstant.CREATE_HOUSE_KEEPER,
-            housekeeper,
-          )
-          .then((response: any) => {
-            this.alertService.successAlert('Housekeeper added successfully!');
-            this.ngOnInit();
-          })
-          .catch((error) => {
-            this.alertService.errorAlert(error?.error?.message);
-          })
-          .finally(() => {
-            this.modalService.dismissAll();
-          });
-      } else {
-        this.crudService
-          .post(APIConstant.UPDATE_HOUSE_KEEPER,
-            housekeeper,
-          )
-          .then((response: any) => {
-            this.alertService.successAlert('Housekeeper updated successfully!');
-            this.ngOnInit();
-          })
-          .catch((error) => {
-            this.alertService.errorAlert(error?.error?.message);
-          })
-          .finally(() => {
-            this.modalService.dismissAll();
-          });
-      }
-
+    //   s.shiftEndTime = d.getHours() + ':' + d.getMinutes();
+    //   s.shiftStartTime = d2.getHours() + ':' + d2.getMinutes();
+    //   if (this.modalAction == 'Add') delete s._id;
+    // }
+    // if (working) {
+    if (this.modalAction == 'Add') {
+      this.crudService
+        .post(APIConstant.CREATE_HOUSE_KEEPER, housekeeper)
+        .then((response: any) => {
+          this.alertService.successAlert('Housekeeper added successfully!');
+          this.ngOnInit();
+        })
+        .catch((error) => {
+          this.alertService.errorAlert(error?.error?.message);
+        })
+        .finally(() => {
+          this.modalService.dismissAll();
+        });
     } else {
-      this.alertService.errorAlert('Please add valid schedule!');
+      this.crudService
+        .post(APIConstant.UPDATE_HOUSE_KEEPER, housekeeper)
+        .then((response: any) => {
+          this.alertService.successAlert('Housekeeper updated successfully!');
+          this.ngOnInit();
+        })
+        .catch((error) => {
+          this.alertService.errorAlert(error?.error?.message);
+        })
+        .finally(() => {
+          this.modalService.dismissAll();
+        });
     }
+    // }
+    // else {
+    //   this.alertService.errorAlert('Please add valid schedule!');
+    // }
   }
 
   activeDeactiveHousekeeper(i: any) {
@@ -248,14 +244,20 @@ export class HouseKeepingComponent implements OnInit {
           active: !this.HouseKeeperData[i].active,
         })
         .then((response: any) => {
-          this.alertService.successAlert(`Housekeeper ${!this.HouseKeeperData[i].active ? "activated" : "deactivated"}  successfully`);
+          this.alertService.successAlert(
+            `Housekeeper ${
+              !this.HouseKeeperData[i].active ? 'activated' : 'deactivated'
+            }  successfully`
+          );
           this.ngOnInit();
         })
         .catch((error) => {
           this.alertService.errorAlert(error.statusMessage);
         });
     } else {
-      this.alertService.errorAlert('You cannot deactivate the housekeeper if the room is assigned to them. Please unassign the room and try again.');
+      this.alertService.errorAlert(
+        'You cannot deactivate the housekeeper if the room is assigned to them. Please unassign the room and try again.'
+      );
       this.ngOnInit();
     }
   }
@@ -265,7 +267,7 @@ export class HouseKeepingComponent implements OnInit {
       roomType: '',
       rooms: [],
       notes: '',
-      housekeeper: ''
+      housekeeper: '',
     });
 
     this.ShowAdd = false;
@@ -273,17 +275,19 @@ export class HouseKeepingComponent implements OnInit {
 
   assignHousekeepingTask() {
     this.crudService
-      .post(APIConstant.CREATE_HOUSE_KEEPING_TASK,
-        this.AssignHousekeepingForm.value,
+      .post(
+        APIConstant.CREATE_HOUSE_KEEPING_TASK,
+        this.AssignHousekeepingForm.value
       )
       .then((response: any) => {
-        this.alertService.successAlert('Housekeeping task assigned successfully!');
+        this.alertService.successAlert(
+          'Housekeeping task assigned successfully!'
+        );
         this.ngOnInit();
-
       })
       .catch((error) => {
         this.alertService.errorAlert(error?.error?.message);
-      })
+      });
   }
 
   showRooms(event: any) {
@@ -316,7 +320,9 @@ export class HouseKeepingComponent implements OnInit {
 
   showAddpop() {
     if (this.HouseKeeperData?.length == 0) {
-      this.alertService.errorAlert("Please add housekeeper for assign housekeeping task");
+      this.alertService.errorAlert(
+        'Please add housekeeper for assign housekeeping task'
+      );
     } else {
       this.ShowAdd = true;
     }
@@ -408,25 +414,22 @@ export class HouseKeepingComponent implements OnInit {
   }
 
   completeTask(item: any) {
-
     console.log(item);
     this.crudService
-      .post(APIConstant.COMPLETE_TASK_BY_ID,
-        {
-          housekeepingId: item.housekeepingId,
-          roomId: item._id
-        }
-      )
+      .post(APIConstant.COMPLETE_TASK_BY_ID, {
+        housekeepingId: item.housekeepingId,
+        roomId: item._id,
+      })
       .then((response: any) => {
-        this.alertService.successAlert('Housekeeping task completed successfully!');
+        this.alertService.successAlert(
+          'Housekeeping task completed successfully!'
+        );
         this.ngOnInit();
       })
       .catch((error) => {
         this.alertService.errorAlert(error?.error?.message);
-      })
-
+      });
   }
-
 
   openModal_sm(content: any) {
     this.Flag = false;
@@ -483,7 +486,9 @@ export class HouseKeepingComponent implements OnInit {
   search(event: any) {
     this.RoomDetails.forEach((element: any) => {
       if (
-        JSON.stringify(element)?.toLowerCase()?.includes(event.target.value.toLowerCase())
+        JSON.stringify(element)
+          ?.toLowerCase()
+          ?.includes(event.target.value.toLowerCase())
       ) {
         element.Show = true;
       } else {

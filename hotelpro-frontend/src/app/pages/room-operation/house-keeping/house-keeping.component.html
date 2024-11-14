@@ -364,7 +364,7 @@
                     </div>
                 </td>
             </tr>
-            <tr>
+            <!-- <tr>
                 <td class="custom_label">
                     <div>Schedule:</div>
                 </td>
@@ -404,7 +404,7 @@
                         </div>
                     </td>
                 </tr>
-            </ng-container>
+            </ng-container> -->
             <tr>
                 <td class="custom_label">
                     <div>Email*:</div>
@@ -423,7 +423,7 @@
                     <div>Contact Number*:</div>
                 </td>
                 <td>
-                    <input type="text" class="form-control" formControlName="phone" [ngClass]="{
+                    <input type="text" class="form-control" formControlName="phone" maxlength="10" [ngClass]="{
               'is-invalid':
                 (HouseKeeperForm.get('phone')?.dirty ||
                   HouseKeeperForm.get('phone')?.touched) &&

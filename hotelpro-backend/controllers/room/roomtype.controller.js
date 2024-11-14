@@ -246,17 +246,17 @@ const getRoomTypeAndRooms = asyncHandler(async (req, res) => {
       $unset: "_id",
     },
   ]);
-  if (roomTypeDetails.length == 0) {
-    return res
-      .status(400)
-      .json(
-        new ApiResponse(
-          400,
-          roomTypeDetails,
-          "Room setup not found for this property!"
-        )
-      );
-  }
+  // if (roomTypeDetails.length == 0) {
+  //   return res
+  //     .status(400)
+  //     .json(
+  //       new ApiResponse(
+  //         400,
+  //         roomTypeDetails,
+  //         "Room setup not found for this property!"
+  //       )
+  //     );
+  // }
   return res
     .status(200)
     .json(

@@ -2,7 +2,7 @@
   <div class="col-md-12 mt-4">
     <div class="d-flex justify-content-end">
       <button class="btn btn-primary" [routerLink]="'/roomtype-setup/' + propertyUnitId + '/ADD'">
-        Add RoomType
+        Add Room Type
       </button>
     </div>
   </div>
@@ -168,7 +168,8 @@
   </table>
   <div class="col-md-12 mt-4">
     <div class="d-flex justify-content-center">
-      <button class="btn btn-primary mb-3" (click)="next()">Next</button>
+      <button class="btn btn-primary mb-3" type="button" (click)="editPropertyUnit()">Back</button>
+      <button class="btn btn-primary mb-3 ms-2" type="button" (click)="next()">Next</button>
     </div>
   </div>
 </div>

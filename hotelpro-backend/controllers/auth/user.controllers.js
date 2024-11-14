@@ -200,6 +200,11 @@ const loginUser = asyncHandler(async (req, res) => {
           as: "propertyUnits",
           pipeline: [
             {
+              $match: {
+                active: true,
+              },
+            },
+            {
               $project: {
                 propertyUnitCode: 1,
                 propertyUnitName: 1,
@@ -362,6 +367,7 @@ const loginUser = asyncHandler(async (req, res) => {
               $project: {
                 propertyUnitCode: 1,
                 propertyUnitName: 1,
+                active: 1,
               },
             },
           ],
@@ -399,9 +405,19 @@ const loginUser = asyncHandler(async (req, res) => {
           propertyUnitName: {
             $first: "$propertyUnits.propertyUnitName",
           },
+          active: {
+            $first: "$propertyUnits.active",
+          },
         },
       },
     ]);
+
+    if (!loggedInUser?.[0]?.active) {
+      throw new ApiError(
+        400,
+        "Property unit is inactive. You can't login to this hotel"
+      );
+    }
   } else if (user.userType == UserTypesEnum.SUPERADMIN) {
     loggedInUser = await User.aggregate([
       {

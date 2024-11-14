@@ -116,6 +116,12 @@ const getAllReservations = asyncHandler(async (req, res) => {
         arrival: 1,
         departure: 1,
         confirmationNumber: 1,
+        createdAt: 1,
+      },
+    },
+    {
+      $sort: {
+        createdAt: -1,
       },
     },
     { $addFields: { Show: true } },

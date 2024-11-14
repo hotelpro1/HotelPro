@@ -50,8 +50,8 @@ export class RoomsReviewComponent implements OnInit {
     this.crudService
       .post(APIConstant.READ_ROOMTYPE_AND_ROOMS + this.propertyUnitId)
       .then((response: any) => {
-        console.log(response);
-        for (let roomtype of response.data) {
+        let sortedRoomTypeData = this.roomSort(response.data);
+        for (let roomtype of sortedRoomTypeData) {
           this.addRoomType(roomtype);
         }
       })
@@ -78,6 +78,7 @@ export class RoomsReviewComponent implements OnInit {
   }
 
   addRoom(roomTypeIndex: number, room?: any): void {
+    this.expandedRowIndices.add(roomTypeIndex);
     this.getRooms(roomTypeIndex).push(this.createRoom(room));
   }
 
@@ -190,5 +191,31 @@ export class RoomsReviewComponent implements OnInit {
   }
   next() {
     this.router.navigate(['/baserate-setup/', this.propertyUnitId]);
+  }
+
+  editPropertyUnit() {
+    this.router.navigate(['/property-setup', this.propertyUnitId]);
+  }
+
+  roomSort(data: any) {
+    for (let rt of data) {
+      rt.rooms.sort((a: any, b: any) => {
+        if (a.roomType < b.roomType) {
+          return -1;
+        }
+        if (a.roomType > b.roomType) {
+          return 1;
+        }
+        if (a.roomName < b.roomName) {
+          return -1;
+        }
+        if (a.roomName > b.roomName) {
+          return 1;
+        }
+        return 0;
+      });
+    }
+
+    return data;
   }
 }

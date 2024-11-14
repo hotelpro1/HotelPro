@@ -64,7 +64,7 @@ export class AddUpdatePropertyComponent implements OnInit {
       ],
       propertyUnitLegalName: ['', [Validators.required]],
       propertyUnitType: ['Hotel', [Validators.required]],
-      description: ['', [Validators.required]],
+      description: [''],
       website: [''],
       propertyAddress: this.fb.group({
         addressLine1: ['', [Validators.required]],
@@ -82,23 +82,9 @@ export class AddUpdatePropertyComponent implements OnInit {
         zipCode: ['', [Validators.required, CustomValidators.zipCodeValidator]],
       }),
       managerDetails: this.fb.group({
-        firstName: [
-          '',
-          [
-            Validators.required,
-            CustomValidators.noLeadingSpace,
-            Validators.minLength(2),
-          ],
-        ],
-        lastName: [
-          '',
-          [
-            Validators.required,
-            CustomValidators.noLeadingSpace,
-            Validators.minLength(2),
-          ],
-        ],
-        phone: ['', [Validators.required]],
+        firstName: ['', [Validators.required, CustomValidators.noLeadingSpace]],
+        lastName: ['', [Validators.required, CustomValidators.noLeadingSpace]],
+        phone: ['', [Validators.required, Validators.minLength(10)]],
         email: ['', [Validators.required, Validators.email]],
       }),
     });
@@ -126,9 +112,7 @@ export class AddUpdatePropertyComponent implements OnInit {
           .then((response: any) => {
             console.log(response);
             this.alertService.successAlert(response.message);
-            this.router.navigate([
-              '/roomtype-setup/' + response?.data?._id + '/ADD',
-            ]);
+            this.propertyUnitId = response?.data?._id;
           })
           .catch((error) => {
             this.alertService.errorAlert(error?.error?.message);
@@ -139,7 +123,6 @@ export class AddUpdatePropertyComponent implements OnInit {
           .then((response: any) => {
             console.log(response);
             this.alertService.successAlert(response.message);
-            this.router.navigate(['/rooms-review', this.propertyUnitId]);
           })
           .catch((error) => {
             this.alertService.errorAlert(error.message);
@@ -148,6 +131,10 @@ export class AddUpdatePropertyComponent implements OnInit {
     } else {
       this.propertyUnitForm.markAllAsTouched(); // Mark all controls as touched to display validation errors
     }
+  }
+
+  navigateToRoomSetup() {
+    this.router.navigate(['/rooms-review/' + this.propertyUnitId]);
   }
 
   getfile(files: File[]) {

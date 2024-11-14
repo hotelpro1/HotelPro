@@ -56,7 +56,7 @@
             <tr>
               <td>Phone</td>
               <td>
-                <input type="text" class="form-control" formControlName="phone" />
+                <input type="text" class="form-control" formControlName="phone" maxlength="10" />
               </td>
             </tr>
             <tr>
@@ -165,7 +165,7 @@
           <div>Contact Number* :</div>
         </td>
         <td>
-          <input type="text" class="form-control" formControlName="phone" [ngClass]="{
+          <input type="text" class="form-control" formControlName="phone" maxlength="10" [ngClass]="{
               'is-invalid':
                 (createUserForm.get('phone')?.dirty ||
                   createUserForm.get('phone')?.touched) &&

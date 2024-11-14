@@ -43,12 +43,12 @@ export class RoomTypeRangeSetupComponent implements OnInit {
     this.roomTypeForm = this.fb.group(
       {
         roomTypeName: ['', Validators.required],
-        active: [false],
-        roomTypeCategory: ['Room', Validators.required],
-        description: ['', Validators.required],
+        active: [true],
+        // roomTypeCategory: ['Room', Validators.required],
+        description: [''],
         adultOccupancy: [0, [Validators.min(1), Validators.required]],
         childOccupancy: [0, Validators.required],
-        baseRate: [0, Validators.required],
+        baseRate: [0],
         rooms: this.fb.array([]),
       },
       { validators: [this.totalRoomsValidator(), this.noOverlappingRanges()] }
@@ -60,7 +60,7 @@ export class RoomTypeRangeSetupComponent implements OnInit {
         .then((response: any) => {
           console.log(response);
           this.roomTypeForm.reset(response.data);
-          this.alertService.successAlert(response.message);
+          // this.alertService.successAlert(response.message);
         })
         .catch((error: any) => {
           this.alertService.errorAlert(error.message);
@@ -107,7 +107,7 @@ export class RoomTypeRangeSetupComponent implements OnInit {
           .then((response: any) => {
             console.log(response);
             this.alertService.successAlert(response.message);
-            this.router.navigate(['/rooms-review/' + this.propertyUnitId]);
+            this.navigateToRoomReview();
           })
           .catch((error: any) => {
             this.alertService.errorAlert(error.message);
@@ -121,14 +121,14 @@ export class RoomTypeRangeSetupComponent implements OnInit {
           .then((response: any) => {
             console.log(response);
             this.alertService.successAlert(response.message);
-            this.router.navigate(['/rooms-review/' + this.propertyUnitId]);
+            this.navigateToRoomReview();
           })
           .catch((error: any) => {
             this.alertService.errorAlert(error.message);
           });
       }
     } else {
-      console.error('Form is invalid');
+      this.roomTypeForm.markAllAsTouched();
     }
   }
 
@@ -193,5 +193,9 @@ export class RoomTypeRangeSetupComponent implements OnInit {
 
       return hasOverlap ? { overlappingRanges: true } : null;
     };
+  }
+
+  navigateToRoomReview() {
+    this.router.navigate(['/rooms-review', this.propertyUnitId]);
   }
 }

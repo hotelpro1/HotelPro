@@ -48,7 +48,7 @@ export class YieldManagementComponent implements OnInit {
     private router: Router,
     private modalService: NgbModal,
     private authService: AuthService
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.propertyUnitId = this.authService.getUserInfo()?.user?.propertyUnitId;
@@ -66,7 +66,7 @@ export class YieldManagementComponent implements OnInit {
   private initForms(): void {
     const yieldFormControls = {
       yieldName: ['', [Validators.required]],
-      yieldDescription: ['', [Validators.required]],
+      yieldDescription: [''],
       ratePlanSetupId: ['', [Validators.required]],
       roomTypeIds: [[], [Validators.required]],
       startDate: [this.Today, [Validators.required]],
@@ -87,7 +87,7 @@ export class YieldManagementComponent implements OnInit {
     };
 
     this.createYieldForm = this.fb.group({
-      ...yieldFormControls
+      ...yieldFormControls,
     });
 
     this.yieldForm = this.fb.group({
@@ -95,7 +95,6 @@ export class YieldManagementComponent implements OnInit {
       active: [true, [Validators.required]],
       yieldId: ['', [Validators.required]],
     });
-
   }
 
   fetchData() {
@@ -114,13 +113,12 @@ export class YieldManagementComponent implements OnInit {
         });
 
         this.createYieldForm.patchValue({
-          ratePlanSetupId: this.RatePlanList[0].item_id
+          ratePlanSetupId: this.RatePlanList[0].item_id,
         });
 
         if (this.yieldData && this.yieldData.length > 0) {
           this.selectYield(this.yieldData[0], 0);
         }
-
       })
       .catch((error) => {
         this.alertService.errorAlert(
@@ -158,8 +156,8 @@ export class YieldManagementComponent implements OnInit {
     this.selectedYieldIndex = index; // Track the selected row index
     let roomTypes = y.roomTypes.map((rt: any) => ({
       roomTypeId: rt._id,
-      roomTypeName: rt.roomTypeName
-    }))
+      roomTypeName: rt.roomTypeName,
+    }));
     this.yieldForm.patchValue({
       yieldId: y._id,
       yieldName: y.yieldName,
@@ -172,7 +170,7 @@ export class YieldManagementComponent implements OnInit {
       occupancyRangeEnd: y.occupancyRangeEnd,
       changeType: y.changeType,
       changeValue: y.changeValue,
-      active: y.active
+      active: y.active,
     });
   }
 
@@ -182,7 +180,7 @@ export class YieldManagementComponent implements OnInit {
         this.yieldForm.controls.startDate.value?.toString() >=
         this.yieldForm.controls.endDate.value?.toString()
       ) {
-        this.alertService.errorAlert("Please select valid dates");
+        this.alertService.errorAlert('Please select valid dates');
         return;
       }
 
@@ -196,10 +194,12 @@ export class YieldManagementComponent implements OnInit {
         })
         .catch((error) => {
           this.alertService.errorAlert(
-            error?.error?.message || 'An error occurred while updating the yield'
+            error?.error?.message ||
+              'An error occurred while updating the yield'
           );
           console.error(error);
-        }).finally(() => {
+        })
+        .finally(() => {
           this.fetchData();
         });
     }
@@ -223,11 +223,13 @@ export class YieldManagementComponent implements OnInit {
   }
 
   getRoomTypeNames(roomType: any) {
-    return roomType.map((room: any) => room.roomTypeName).sort().join(' ');
+    return roomType
+      .map((room: any) => room.roomTypeName)
+      .sort()
+      .join(' ');
   }
 
   openModalCreateYield(content: any) {
-
     this.createYieldForm.patchValue({
       yieldName: '',
       yieldDescription: '',
