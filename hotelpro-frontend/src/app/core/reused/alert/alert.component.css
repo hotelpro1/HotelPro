@@ -1,7 +1,7 @@
 .alert-container {
   position: relative;
-  z-index: 2;
-  top: 30px;
+  z-index: 6;
+  top: 52px;
 }
 
 .center-div {

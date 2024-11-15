@@ -337,13 +337,13 @@
     <form [formGroup]="HouseKeeperForm" class="px-2 mt-2 fix_height">
         <table class="table table-sm table-borderless add_table1">
             <tr>
-                <td class="custom_label">
-                    <div>Name*:</div>
+                <td>
+                    <div>Name* :</div>
                 </td>
                 <td>
-                    <div class="d-flex justify-content-between">
+                    <div class="d-flex justify-content-between p-0">
                         <div>
-                            <input type="text" formControlName="firstName" class="form-control field"
+                            <input type="text" formControlName="firstName" class="form-control"
                                 placeholder="First Name" [ngClass]="{
                                     'is-invalid':
                                       HouseKeeperForm.get('firstName')?.invalid &&
@@ -353,7 +353,7 @@
                         </div>
 
                         <div>
-                            <input type="text" formControlName="lastName" class="form-control field"
+                            <input type="text" formControlName="lastName" class="form-control"
                                 placeholder="Last Name" [ngClass]="{
                                     'is-invalid':
                                       HouseKeeperForm.get('lastName')?.invalid &&
@@ -406,11 +406,11 @@
                 </tr>
             </ng-container> -->
             <tr>
-                <td class="custom_label">
-                    <div>Email*:</div>
+                <td>
+                    <div class="my-2">Email* :</div>
                 </td>
                 <td>
-                    <input type="email" formControlName="email" class="form-control field" [ngClass]="{
+                    <input type="email" formControlName="email" class="form-control" placeholder="Email" [ngClass]="{
                         'is-invalid':
                           HouseKeeperForm.get('email')?.invalid &&
                           (HouseKeeperForm.get('email')?.dirty ||
@@ -419,11 +419,11 @@
                 </td>
             </tr>
             <tr>
-                <td class="custom_label">
-                    <div>Contact Number*:</div>
+                <td>
+                    <div>Contact Number* :</div>
                 </td>
                 <td>
-                    <input type="text" class="form-control" formControlName="phone" maxlength="10" [ngClass]="{
+                    <input type="text" class="form-control" formControlName="phone" placeholder="Contact" maxlength="10" [ngClass]="{
               'is-invalid':
                 (HouseKeeperForm.get('phone')?.dirty ||
                   HouseKeeperForm.get('phone')?.touched) &&
