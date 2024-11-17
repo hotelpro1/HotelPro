@@ -329,8 +329,9 @@
           Total Tax :
           <span class="fw-semibold">{{
             (
-              groupForm.get("totalCost")?.value -
-              groupForm.get("totalPrice")?.value
+              groupForm.get("totalCost")?.value ||
+              0 - groupForm.get("totalPrice")?.value ||
+              0
             )?.toFixed(2)
           }}</span></label
         >
