@@ -55,6 +55,7 @@ export class FutureAvailabilityComponent implements OnInit {
 
   fetchData() {
     if (this.Week < 2) this.Week = 2;
+    if (this.Week > 52) this.Week = 52;
     let startDate = new Date(this.Date.replace(/-/g, "/"));
     let endDate = new Date(startDate);
     endDate.setDate(endDate.getDate() + this.Week * 7);

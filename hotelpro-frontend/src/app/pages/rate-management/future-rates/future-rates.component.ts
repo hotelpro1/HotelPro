@@ -62,7 +62,7 @@ export class FutureRatesComponent {
     private activeRoute: ActivatedRoute,
     private modalService: NgbModal,
     private authService: AuthService
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.propertyUnitId = this.authService.getUserInfo()?.user?.propertyUnitId;
@@ -116,6 +116,7 @@ export class FutureRatesComponent {
 
   fetchdata() {
     if (this.Week < 2) this.Week = 2;
+    if (this.Week > 52) this.Week = 52;
     if (
       new Date(this.Date).toISOString() < new Date(this.Today).toISOString()
     ) {
