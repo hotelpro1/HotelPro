@@ -216,7 +216,7 @@ const getClientDashboard = asyncHandler(async (req, res) => {
   }
 
   // Fetch property and rooms data using Promise.all
-  const [property, rooms] = await Promise.all([
+  const [property, rooms, users] = await Promise.all([
     // First aggregation pipeline for property details
     Property.aggregate([
       {
@@ -282,6 +282,51 @@ const getClientDashboard = asyncHandler(async (req, res) => {
         },
       },
     ]),
+
+    // Third aggregation pipeline for user details
+    Property.aggregate([
+      { $match: { _id: propertyId } },
+      {
+        $lookup: {
+          from: "propertyunits",
+          localField: "_id",
+          foreignField: "propertyId",
+          pipeline: [{ $match: matchQuery }],
+          as: "propertyUnits",
+        },
+      },
+      { $unwind: "$propertyUnits" },
+      {
+        $lookup: {
+          from: "users",
+          localField: "propertyUnits._id",
+          foreignField: "propertyUnitId",
+          as: "users",
+          pipeline: [
+            {
+              $match: {
+                userType: {
+                  $in: ["frontdesk", "housekeeper", "manager"],
+                },
+              },
+            },
+          ],
+        },
+      },
+      {
+        $unwind: {
+          path: "$users",
+        },
+      },
+      {
+        $group: {
+          _id: "$_id",
+          totalUsers: {
+            $sum: 1,
+          },
+        },
+      },
+    ]),
   ]);
 
   // Check if property data exists
@@ -292,6 +337,7 @@ const getClientDashboard = asyncHandler(async (req, res) => {
   // Prepare the response data
   response.property = property[0];
   response.rooms = rooms.length > 0 ? rooms[0] : { totalRooms: 0 };
+  response.users = users.length > 0 ? users[0] : { totalUsers: 0 };
 
   // Send the response
   return res
