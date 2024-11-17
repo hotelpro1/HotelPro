@@ -1252,7 +1252,7 @@ const stayUpdate = asyncHandler(async (req, res) => {
 
 const readReservationRate = asyncHandler(async (req, res) => {
   let { propertyUnitId } = req.params;
-  let { arrival, departure, adults, childs } = req.body;
+  let { arrival, departure } = req.body;
   let nextDate = new Date(arrival);
 
   arrival = new Date(arrival);

@@ -122,13 +122,6 @@
         </label>
         <br />
         <label class="form-label">
-          Total Cost:
-          <span class="fw-semibold">{{
-            groupDetails?.totalCost | currency
-          }}</span>
-        </label>
-        <br />
-        <label class="form-label">
           Total Price:
           <span class="fw-semibold">{{
             groupDetails?.totalPrice | currency
@@ -141,10 +134,18 @@
             groupDetails?.totalTax | currency
           }}</span>
         </label>
+        <br />
         <label class="form-label">
           Total Charge:
           <span class="fw-semibold">{{
             groupDetails?.totalExtraCharge | currency
+          }}</span>
+        </label>
+        <br />
+        <label class="form-label">
+          Total Cost:
+          <span class="fw-semibold">{{
+            groupDetails?.totalCost | currency
           }}</span>
         </label>
       </div>
@@ -400,13 +401,6 @@
         >
         <br />
         <label class="form-label">
-          Room Cost:
-          <span class="fw-semibold"
-            >{{ reservation?.reservationDetails?.roomCost | currency }}
-          </span></label
-        >
-        <br />
-        <label class="form-label">
           Room Price:
           <span class="fw-semibold"
             >{{ reservation?.reservationDetails?.roomPrice | currency }}
@@ -422,7 +416,14 @@
 
         <br />
         <label class="form-label">
-          RatePlan :
+          Room Cost:
+          <span class="fw-semibold"
+            >{{ reservation?.reservationDetails?.roomCost | currency }}
+          </span></label
+        >
+        <br />
+        <label class="form-label">
+          Rate Plan :
           <span class="fw-semibold"
             >{{ reservation?.rateDetails?.ratePlanName }}
           </span></label
