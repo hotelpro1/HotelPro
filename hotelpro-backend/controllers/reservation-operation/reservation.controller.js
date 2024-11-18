@@ -1252,7 +1252,7 @@ const stayUpdate = asyncHandler(async (req, res) => {
 
 const readReservationRate = asyncHandler(async (req, res) => {
   let { propertyUnitId } = req.params;
-  let { arrival, departure, adults, childs } = req.body;
+  let { arrival, departure } = req.body;
   let nextDate = new Date(arrival);
 
   arrival = new Date(arrival);
@@ -2566,7 +2566,7 @@ const changeRoomReservation = asyncHandler(async (req, res) => {
     console.log("Transaction committed successfully");
     return res
       .status(201)
-      .json(new ApiResponse(201, data, "Reservation created successfully"));
+      .json(new ApiResponse(201, data, "Room change successfully"));
   } catch (error) {
     const DeallocatedRoomLocks = await deallocateMultipleRooms(
       AllInsertedRoomLockIds

@@ -147,8 +147,8 @@
             }}
           </span>
         </td>
-        <td>{{ room.roomPrice }}</td>
-        <td>{{ room.roomCost }}</td>
+        <td>{{ room?.roomPrice?.toFixed(2) }}</td>
+        <td>{{ room?.roomCost?.toFixed(2) }}</td>
         <td>
           <button
             class="btn btn-primary p-0 me-1"
@@ -203,7 +203,7 @@
         groupForm.get('adults')?.value + groupForm.get('childs')?.value
       "
     >
-      (Total Cost {{ groupForm.get("totalCost")?.value }})
+      (Total Cost {{ groupForm.get("totalCost")?.value?.toFixed(2) }})
     </ng-container>
   </button>
 </div>

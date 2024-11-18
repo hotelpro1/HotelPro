@@ -250,6 +250,7 @@ const getFutureRates = asyncHandler(async (req, res) => {
                 da.yieldChangeType,
                 da.yieldChangeValue
               );
+              dr.yieldApplied = true;
             }
           }
         }

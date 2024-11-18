@@ -95,6 +95,21 @@ export class ReservationInfoComponent implements OnInit {
       this.populateReservations(data.reservationDetails);
       this.roomTypeRooms = data.roomTypeRooms;
     }
+
+    let rd = sessionStorage.getItem('reservationsArray');
+    if (rd) {
+      const reservationsData = JSON.parse(rd);
+      this.reservations.clear();
+      reservationsData.forEach((reservation: any) => {
+        this.reservations.push(this.createReservation(reservation));
+      });
+    }
+
+    let gd = sessionStorage.getItem('groupDetails');
+    if (gd) {
+      let groupdata = JSON.parse(gd);
+      this.groupForm.patchValue(groupdata);
+    }
   }
 
   private formatDate(date: Date): string {
@@ -263,6 +278,7 @@ export class ReservationInfoComponent implements OnInit {
       JSON.stringify(this.groupForm.value)
     );
     this.router.navigate([`/reservation-payment`]);
+    this.modalService.dismissAll();
   }
   onReserve(content: TemplateRef<any>): void {
     this.modalService.open(content).result.then((result) => {

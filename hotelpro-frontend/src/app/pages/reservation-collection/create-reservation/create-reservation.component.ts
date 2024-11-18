@@ -52,12 +52,19 @@ export class CreateReservationComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private modalService: NgbModal
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.propertyUnitId = this.authService.getUserInfo()?.user?.propertyUnitId;
     // this.propertyUnitId = this.route.snapshot.paramMap.get('propertyUnitId');
     this.initForms();
+    this.clearSession();
+  }
+
+  private clearSession(): void {
+    sessionStorage.removeItem('reservationsArray');
+    sessionStorage.removeItem('groupDetails');
+    sessionStorage.removeItem('resdata');
   }
 
   private initForms(): void {
@@ -65,7 +72,7 @@ export class CreateReservationComponent implements OnInit {
     const arrivalDate = this.formatDate(today);
     this.Today = arrivalDate;
     const departureDate = this.formatDate(
-      new Date(today.getTime() + 2 * 24 * 60 * 60 * 1000)
+      new Date(today.getTime() + 1 * 24 * 60 * 60 * 1000)
     );
 
     this.groupForm = this.fb.group({

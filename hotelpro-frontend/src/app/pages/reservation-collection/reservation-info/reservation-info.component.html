@@ -322,20 +322,23 @@
         <label class="form-label w-100">
           Total Price :
           <span class="fw-semibold">{{
-            groupForm.get("totalPrice")?.value
+            groupForm.get("totalPrice")?.value?.toFixed(2)
           }}</span></label
         >
         <label class="form-label w-100">
           Total Tax :
           <span class="fw-semibold">{{
-            groupForm.get("totalCost")?.value -
-              groupForm.get("totalPrice")?.value
+            (
+              groupForm.get("totalCost")?.value ||
+              0 - groupForm.get("totalPrice")?.value ||
+              0
+            )?.toFixed(2)
           }}</span></label
         >
         <label class="form-label">
           Total Cost :
           <span class="fw-semibold">{{
-            groupForm.get("totalCost")?.value
+            groupForm.get("totalCost")?.value?.toFixed(2)
           }}</span></label
         >
       </div>
@@ -542,6 +545,7 @@
                   class="form-control"
                   formControlName="phone"
                   placeholder="Enter  Phone"
+                  maxlength="10"
                   [ngClass]="{
                     'is-invalid':
                       (guest.get('phone')?.dirty ||
@@ -758,7 +762,7 @@
             <label class="form-label mt-2">
               Room Price :
               <span class="fw-semibold"
-                >{{ reservation?.get("roomPrice")?.value }}
+                >{{ reservation?.get("roomPrice")?.value?.toFixed(2) }}
               </span>
             </label>
             <br />
@@ -768,7 +772,7 @@
                 class="link"
                 (click)="openUpdateRate(RateUpdate, reservation?.value, i)"
               >
-                {{ reservation?.get("roomCost")?.value }}
+                {{ reservation?.get("roomCost")?.value?.toFixed(2) }}
               </a></label
             >
           </div>

@@ -58,7 +58,7 @@ export class TapeChartComponent {
     private activeRoute: ActivatedRoute,
     private modalService: NgbModal,
     private authService: AuthService
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.propertyUnitId = this.authService.getUserInfo()?.user?.propertyUnitId;
@@ -82,6 +82,7 @@ export class TapeChartComponent {
 
   fetchdata() {
     if (this.Week < 2) this.Week = 2;
+    if (this.Week > 52) this.Week = 52;
     if (
       new Date(this.Date).toISOString() < new Date(this.Today).toISOString()
     ) {
@@ -102,136 +103,14 @@ export class TapeChartComponent {
       this.DateArr.push(new Date(d));
     }
 
-    // this.RoomData = [{
-    //   roomTypeName: "Hiren",
-    //   roomDetails: [
-    //     {
-    //       roomName: "A1",
-    //       roomCondition: "clean",
-    //       reservation: [
-    //         {
-    //           guestName: "John Doe",
-    //           arrival: "2024-09-28T00:00:00.000Z",
-    //           departure: "2024-09-30T00:00:00.000Z",
-    //           tentative: false,
-    //           reservationStatus: 'reserved'
-    //         },
-    //         {
-    //           guestName: "John Doe",
-    //           arrival: "2024-10-05T00:00:00.000Z",
-    //           departure: "2024-10-20T00:00:00.000Z",
-    //           tentative: false,
-    //           reservationStatus: 'reserved'
-    //         },
-    //       ],
-    //       maintenance: [
-    //         {
-    //           reason: "other",
-    //           startDate: "2024-10-01T00:00:00.000Z",
-    //           endDate: "2024-10-03T00:00:00.000Z",
-    //         }
-    //       ],
-    //     },
-    //   ],
-    //   dateRate: [
-    //     {
-    //       Date: "2024-09-28T07:00:00.000Z",
-    //       Available: 10,
-    //       baseRate: 100,
-    //     },
-    //     {
-    //       Date: "2024-09-29T07:00:00.000Z",
-    //       Available: 10,
-    //       baseRate: 100,
-    //     },
-    //     {
-    //       Date: "2024-09-30T07:00:00.000Z",
-    //       Available: 10,
-    //       baseRate: 100,
-    //     },
-    //   ],
-    // },
-    // {
-    //   roomTypeName: "King",
-    //   roomDetails: [
-    //     {
-    //       roomName: "A1",
-    //       roomCondition: "clean",
-    //       reservation: [
-    //         {
-    //           guestName: "John Doe",
-    //           arrival: "2024-09-28T00:00:00.000Z",
-    //           departure: "2024-09-30T00:00:00.000Z",
-    //           tentative: false,
-    //           reservationStatus: 'reserved'
-    //         },
-    //         {
-    //           guestName: "John Doe",
-    //           arrival: "2024-10-05T00:00:00.000Z",
-    //           departure: "2024-10-20T00:00:00.000Z",
-    //           tentative: false,
-    //           reservationStatus: 'reserved'
-    //         },
-    //       ],
-    //       maintenance: [
-    //         {
-    //           reason: "other",
-    //           startDate: "2024-10-01T00:00:00.000Z",
-    //           endDate: "2024-10-03T00:00:00.000Z",
-    //         }
-    //       ],
-    //     },
-    //     {
-    //       roomName: "A2",
-    //       roomCondition: "dirty",
-    //       reservation: [
-    //         {
-    //           guestName: "John Doe",
-    //           arrival: "2024-09-28T00:00:00.000Z",
-    //           departure: "2024-09-30T00:00:00.000Z",
-    //           tentative: false,
-    //           reservationStatus: 'reserved'
-    //         },
-    //         {
-    //           guestName: "John Doe",
-    //           arrival: "2024-10-05T00:00:00.000Z",
-    //           departure: "2024-10-20T00:00:00.000Z",
-    //           tentative: false,
-    //           reservationStatus: 'reserved'
-    //         },
-    //       ],
-    //       maintenance: [
-    //         {
-    //           reason: "other",
-    //           startDate: "2024-10-01T00:00:00.000Z",
-    //           endDate: "2024-10-03T00:00:00.000Z",
-    //         }
-    //       ],
-    //     },
-    //   ],
-    //   dateRate: [
-    //     {
-    //       Date: "2024-09-28T07:00:00.000Z",
-    //       Available: 10,
-    //       baseRate: 100,
-    //     },
-    //     {
-    //       Date: "2024-09-29T07:00:00.000Z",
-    //       Available: 10,
-    //       baseRate: 100,
-    //     },
-    //     {
-    //       Date: "2024-09-30T07:00:00.000Z",
-    //       Available: 10,
-    //       baseRate: 100,
-    //     },
-    //   ],
-    // }];
+
+    const payloadStartDate = this.startDate.toLocaleDateString('en-CA'); // "yyyy-mm-dd"
+    const payloadEndDate = this.endDate.toLocaleDateString('en-CA');
 
     this.crudService
       .post(APIConstant.READ_TAPECHART, {
-        startDate: this.startDate,
-        endDate: this.endDate,
+        startDate: payloadStartDate,
+        endDate: payloadEndDate,
         propertyUnitId: this.propertyUnitId,
       })
       .then((response: any) => {
