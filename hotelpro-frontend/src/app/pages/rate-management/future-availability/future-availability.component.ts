@@ -22,10 +22,10 @@ import { CommonModule, DatePipe } from '@angular/common';
     CommonModule,
     ReactiveFormsModule,
     RouterModule,
-    DatePipe
+    DatePipe,
   ],
   templateUrl: './future-availability.component.html',
-  styleUrl: './future-availability.component.css'
+  styleUrl: './future-availability.component.css',
 })
 export class FutureAvailabilityComponent implements OnInit {
   userInfo: any;
@@ -34,14 +34,12 @@ export class FutureAvailabilityComponent implements OnInit {
   Date: any;
   Max: any;
 
-
-
   constructor(
     private authService: AuthService,
     private router: Router,
     private crudService: CrudService,
     private alertService: AlertService
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.userInfo = this.authService.getUserInfo()?.user;
@@ -56,15 +54,18 @@ export class FutureAvailabilityComponent implements OnInit {
   fetchData() {
     if (this.Week < 2) this.Week = 2;
     if (this.Week > 52) this.Week = 52;
-    let startDate = new Date(this.Date.replace(/-/g, "/"));
+    let startDate = new Date(this.Date.replace(/-/g, '/'));
     let endDate = new Date(startDate);
     endDate.setDate(endDate.getDate() + this.Week * 7);
+
+    const payloadStartDate = startDate.toLocaleDateString('en-CA'); // "yyyy-mm-dd"
+    const payloadEndDate = endDate.toLocaleDateString('en-CA');
 
     this.crudService
       .post(APIConstant.READ_FUTURE_AVAILABILITY, {
         propertyUnitId: this.userInfo.propertyUnitId,
-        startDate,
-        endDate,
+        startDate: payloadStartDate,
+        endDate: payloadEndDate,
       })
       .then((response: any) => {
         this.availabilityData = response.data;
@@ -84,5 +85,4 @@ export class FutureAvailabilityComponent implements OnInit {
       this.Week -= 1;
     }
   }
-
 }
