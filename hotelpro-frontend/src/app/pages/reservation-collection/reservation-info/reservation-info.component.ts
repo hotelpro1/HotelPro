@@ -75,7 +75,7 @@ export class ReservationInfoComponent implements OnInit {
       totalPrice: [0],
       firstName: ['', [Validators.required, Validators.minLength(2)]],
       lastName: ['', [Validators.required, Validators.minLength(2)]],
-      email: ['', [Validators.required, Validators.email]],
+      email: ['', [Validators.email]],
       phone: [''],
       addressLine1: [''],
       addressLine2: [''],
@@ -162,7 +162,7 @@ export class ReservationInfoComponent implements OnInit {
     return this.fb.group({
       firstName: [guest?.firstName || '', Validators.required],
       lastName: [guest?.lastName || '', Validators.required],
-      email: [guest?.email || '', [Validators.required, Validators.email]],
+      email: [guest?.email || '', [Validators.email]],
       phone: [guest?.phone || ''],
       addressLine1: [guest?.addressLine1 || ''],
       addressLine2: [guest?.addressLine2 || ''],
