@@ -18,7 +18,6 @@ import {
   RoomType,
   Room,
   User,
-  housekeeperWorkerShift,
 } from "../../database/database.schema.js";
 
 const ObjectId = mongoose.Types.ObjectId;
@@ -106,21 +105,21 @@ const getHouseKeeper = asyncHandler(async (req, res) => {
         userType: UserTypesEnum.HOUSEKEEPER,
       },
     },
-    {
-      $lookup: {
-        from: "housekeeperworkershifts",
-        localField: "_id",
-        foreignField: "housekeeperId",
-        as: "schedule",
-      },
-    },
+    // {
+    //   $lookup: {
+    //     from: "housekeeperworkershifts",
+    //     localField: "_id",
+    //     foreignField: "housekeeperId",
+    //     as: "schedule",
+    //   },
+    // },
     {
       $project: {
         housekeeperName: {
           $concat: ["$firstName", " ", "$lastName"],
         },
         active: "$isLoginable",
-        schedule: 1,
+        // schedule: 1,
       },
     },
     {
@@ -243,21 +242,21 @@ const getRoomsWithHouseKeeping = asyncHandler(async (req, res) => {
           userType: UserTypesEnum.HOUSEKEEPER,
         },
       },
-      {
-        $lookup: {
-          from: "housekeeperworkershifts",
-          localField: "_id",
-          foreignField: "housekeeperId",
-          as: "schedule",
-        },
-      },
+      // {
+      //   $lookup: {
+      //     from: "housekeeperworkershifts",
+      //     localField: "_id",
+      //     foreignField: "housekeeperId",
+      //     as: "schedule",
+      //   },
+      // },
       {
         $project: {
           housekeeperName: {
             $concat: ["$firstName", " ", "$lastName"],
           },
           active: "$isLoginable",
-          schedule: 1,
+          // schedule: 1,
           firstName: 1,
           lastName: 1,
           phone: 1,
@@ -285,14 +284,14 @@ const getRoomsWithHouseKeeping = asyncHandler(async (req, res) => {
     hd.assignedRoom = assignRoomCount;
   }
 
-  for (let hd of data.housekeeperDetail) {
-    hd.schedule.sort((a, b) => {
-      return (
-        AvailableWeekDayEnum.indexOf(a.day) -
-        AvailableWeekDayEnum.indexOf(b.day)
-      );
-    });
-  }
+  // for (let hd of data.housekeeperDetail) {
+  //   hd.schedule.sort((a, b) => {
+  //     return (
+  //       AvailableWeekDayEnum.indexOf(a.day) -
+  //       AvailableWeekDayEnum.indexOf(b.day)
+  //     );
+  //   });
+  // }
 
   return res
     .status(200)
@@ -342,7 +341,7 @@ const createHouseKeepingTask = asyncHandler(async (req, res) => {
       roomId: a.item_id,
       propertyUnitId,
       housekeeperId,
-      taskName,
+      taskName: "Room Cleaning",
       taskDescription,
     });
   }
