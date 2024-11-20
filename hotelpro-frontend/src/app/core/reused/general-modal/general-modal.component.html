@@ -1,10 +1,10 @@
 <div class="modal-header">
-  <h4
+  <h5
     *ngIf="type === 'confirmation' && headerMessage"
     class="modal-title"
     id="modal-basic-title"
     [innerHTML]="sanitizeMsg(headerMessage)"
-  ></h4>
+  ></h5>
   <h6
     *ngIf="type !== 'confirmation' && message"
     class="mb-0"

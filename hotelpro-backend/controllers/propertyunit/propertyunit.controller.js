@@ -174,6 +174,24 @@ const updatePropertyUnitById = asyncHandler(async (req, res) => {
     );
 });
 
+const updatePropertyUnitStatus = asyncHandler(async (req, res) => {
+  const { propertyUnitId } = req.params;
+  const { active } = req.body;
+  const propertyUnit = await PropertyUnit.findByIdAndUpdate(
+    propertyUnitId,
+    {
+      active,
+    },
+    { new: true }
+  );
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, propertyUnit, "Property unit updated successfully")
+    );
+});
+
 // DELETE a property unit by ID
 const deletePropertyUnitById = asyncHandler(async (req, res) => {
   const { propertyUnitId } = req.params;
@@ -386,4 +404,5 @@ export default {
   deletePropertyUnitById,
   switchProperty,
   getFrontDeskDashboard,
+  updatePropertyUnitStatus,
 };

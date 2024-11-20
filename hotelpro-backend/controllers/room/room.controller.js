@@ -46,6 +46,15 @@ const updateRoomById = asyncHandler(async (req, res) => {
   const { roomId } = req.params;
   const { roomName, roomNumber, roomTypeId, roomStatus, roomCondition, dnd } =
     req.body;
+  const roomExist = await Room.find({
+    roomName,
+    roomNumber,
+    roomTypeId,
+    _id: { $ne: roomId },
+  });
+  if (roomExist) {
+    throw new ApiError(404, "Same Room Already exists !");
+  }
   const room = await Room.findByIdAndUpdate(
     roomId,
     {

@@ -18,6 +18,7 @@ export const APIConstant = {
   UPLOAD_ROOMS_PHOTOS: 'property/upload-rooms-photos',
 
   UPDATE_PROPERTY_UNIT: 'propertyunit/update-propertyunit/',
+  UPDATE_PROPERTY_UNIT_STATUS: 'propertyunit/update-propertyunit-status/',
   CREATE_PROPERTY_UNIT: 'propertyunit/create-propertyunit',
   READ_PROPERTY_UNIT: 'propertyunit/read-propertyunit/',
   SWITCH_PROPERTY: 'propertyunit/switch-property',

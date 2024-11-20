@@ -27,6 +27,7 @@ export class CreateReservationPaymentComponent implements OnInit {
   reservationsArray: any;
   propertyUnitId: string | null = '';
   currentBalance: number = 0;
+  isWalkin: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -39,6 +40,8 @@ export class CreateReservationPaymentComponent implements OnInit {
 
   ngOnInit(): void {
     this.propertyUnitId = this.authService.getUserInfo()?.user?.propertyUnitId;
+    this.isWalkin = this.router.url == '/reservation-payment' ? false : true;
+
     // this.propertyUnitId = this.route.snapshot.paramMap.get('propertyUnitId');
     this.paymentForm = this.fb.group({
       paymentType: ['cash'],
@@ -83,6 +86,7 @@ export class CreateReservationPaymentComponent implements OnInit {
       reservationsArray: this.reservationsArray,
       groupDetails: this.groupDetails,
       paymentEntries: this.paymentEntries,
+      isWalkin: this.isWalkin,
     };
     this.crudService
       .post(APIConstant.CREATE_RESERVATION, sendObj)

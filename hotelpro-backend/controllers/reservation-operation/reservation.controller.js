@@ -24,6 +24,7 @@ import {
   UserTypesEnum,
   ReservationStatusEnum,
   BalanceNameEnum,
+  AvailableReservationStatusEnum,
 } from "../../constants.js";
 import {
   deleteFromCloudinary,
@@ -96,6 +97,7 @@ const getAllReservations = asyncHandler(async (req, res) => {
     {
       $unwind: {
         path: "$roomDetail",
+        preserveNullAndEmptyArrays: true,
       },
     },
     {
@@ -153,8 +155,13 @@ const createReservation = asyncHandler(async (req, res) => {
     await session.withTransaction(async () => {
       console.log("Transaction started");
 
-      let { groupDetails, reservationsArray, paymentEntries, propertyUnitId } =
-        req.body;
+      let {
+        groupDetails,
+        reservationsArray,
+        paymentEntries,
+        propertyUnitId,
+        isWalkin,
+      } = req.body;
 
       if (transaction_retry_count > 0) {
         console.log("in retry");
@@ -373,6 +380,8 @@ const createReservation = asyncHandler(async (req, res) => {
           arrival: groupData.arrival,
           departure: groupData.departure,
         });
+        if (isWalkin)
+          reservationObj.reservationStatus = ReservationStatusEnum.INHOUSE;
 
         let reservationDetailObj = new ReservationDetail({
           ...reservation,

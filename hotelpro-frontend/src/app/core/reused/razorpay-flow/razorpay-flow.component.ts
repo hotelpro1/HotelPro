@@ -2,10 +2,11 @@ import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
 import { CrudService } from '../../services/crud.service';
 import { APIConstant } from '../../constants/APIConstant';
 import { environment } from '../../../../environments/environment.development';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
 import { PaymentSharedService } from '../../services/payment-shared.service';
 import { AlertService } from '../../services/alert.service';
+import { NgZone } from '@angular/core';
 
 interface PaymentData {
   paymentOrderId: string;
@@ -18,7 +19,7 @@ interface PaymentData {
 @Component({
   selector: 'app-razorpay-flow',
   standalone: true,
-  imports: [],
+  imports: [RouterLink],
   templateUrl: './razorpay-flow.component.html',
   styleUrls: ['./razorpay-flow.component.css'],
 })
@@ -32,7 +33,8 @@ export class RazorpayFlowComponent implements OnInit {
     private router: Router,
     private paymentSharedService: PaymentSharedService,
     private alertService: AlertService,
-    @Inject(PLATFORM_ID) private platformId: object
+    @Inject(PLATFORM_ID) private platformId: object,
+    private _ngZone: NgZone
   ) {}
 
   async ngOnInit() {
@@ -40,11 +42,15 @@ export class RazorpayFlowComponent implements OnInit {
     this.paymentSharedService.paymentData$.subscribe((data) => {
       if (data) {
         this.paymentData = data;
+
         this.payWithRazorpay();
       }
     });
+    console.log(this.paymentData);
   }
-
+  isEmpty(obj: any) {
+    return Object.keys(obj).length === 0;
+  }
   loadRazorpayScript(): Promise<void> {
     return new Promise((resolve, reject) => {
       if (
@@ -100,15 +106,15 @@ export class RazorpayFlowComponent implements OnInit {
         },
       },
     };
-
-    const rzp = new (window as any).Razorpay(options);
-    rzp.open();
-
     options.modal.ondismiss = () => {
       console.log('Transaction has been cancelled.');
-      this.alertService.successAlert('Transaction has been cancelled.');
-      this.router.navigateByUrl(`guest-folio/${this.paymentData.groupId}`);
+      this._ngZone.run(() => {
+        this.alertService.errorAlert('Transaction has been cancelled.');
+        this.router.navigateByUrl(`guest-folio/${this.paymentData.groupId}`);
+      });
     };
+    const rzp = new (window as any).Razorpay(options);
+    rzp.open();
   }
 
   handlePaymentSuccess(response: any) {
@@ -123,14 +129,18 @@ export class RazorpayFlowComponent implements OnInit {
       .post(APIConstant.POST_RESERVATION_PAYMENT, obj)
       .then((response: any) => {
         this.alertService.successAlert(response.message);
-        this.router.navigateByUrl(`guest-folio/${this.paymentData.groupId}`);
+        this._ngZone.run(() =>
+          this.router.navigateByUrl(`guest-folio/${this.paymentData.groupId}`)
+        );
       })
       .catch((error: any) => {
         console.error('There was an error!', error);
         this.alertService.errorAlert(
           error?.error?.message || 'An error occurred while doing Payment'
         );
-        this.router.navigateByUrl(`guest-folio/${this.paymentData.groupId}`);
+        this._ngZone.run(() =>
+          this.router.navigateByUrl(`guest-folio/${this.paymentData.groupId}`)
+        );
       });
   }
 }

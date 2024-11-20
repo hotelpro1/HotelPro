@@ -12,11 +12,18 @@ import { AlertService } from '../../../core/services/alert.service';
 import { CrudService } from '../../../core/services/crud.service';
 import { APIConstant } from '../../../core/constants/APIConstant';
 import { CommonModule } from '@angular/common';
+import { PropertySidebarComponent } from '../property-sidebar/property-sidebar.component';
 
 @Component({
   selector: 'app-tax-set',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    RouterModule,
+    PropertySidebarComponent,
+  ],
   templateUrl: './tax-set.component.html',
   styleUrls: ['./tax-set.component.css'],
 })

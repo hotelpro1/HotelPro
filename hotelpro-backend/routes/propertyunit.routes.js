@@ -10,6 +10,10 @@ router.post(
   propertyUnitController.updatePropertyUnitById
 );
 router.post(
+  "/update-propertyunit-status/:propertyUnitId",
+  propertyUnitController.updatePropertyUnitStatus
+);
+router.post(
   "/read-propertyunit/:propertyUnitId",
   propertyUnitController.getPropertyUnitById
 );

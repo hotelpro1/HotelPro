@@ -119,6 +119,22 @@ const createRoomTypeWithRooms = asyncHandler(async (req, res) => {
   } = req.body;
   const { propertyUnitId } = req.params;
 
+  const roomTypeExists = await RoomType.findOne({
+    roomTypeName,
+    propertyUnitId,
+  });
+  if (roomTypeExists) {
+    return res
+      .status(400)
+      .json(
+        new ApiResponse(
+          400,
+          null,
+          `RoomType With ${roomTypeName} name already exists !`
+        )
+      );
+  }
+
   // Create the room type
   const newRoomType = new RoomType({
     roomTypeName,

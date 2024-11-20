@@ -270,6 +270,13 @@
         <div class="col mt-3">
           <div *ngFor="let s of groupForm.get('documents')?.value">
             <img [src]="s" alt="img" style="height: 100px; width: 100px" />
+            <i
+              class="material-symbols-rounded text-danger pt-2"
+              style="vertical-align: middle; cursor: pointer"
+              (click)="deletePhotos(s, groupForm)"
+            >
+              delete
+            </i>
           </div>
         </div>
       </div>
@@ -277,7 +284,9 @@
   </div>
   <div class="col-3">
     <div class="card container_form p-3 m-2 rounded">
-      <label class="form-label fw-semibold">Reservation Summary</label>
+      <label class="form-label fw-semibold">
+        {{ isWalkin ? "Walk In" : "Reservation" }} Summary</label
+      >
       <div class="card-body">
         <label class="form-label">
           CheckIn Date :
@@ -364,7 +373,7 @@
           style="cursor: pointer"
         >
           <h5 class="form-label fw-semibold">
-            Reservation Details of (
+            {{ isWalkin ? "Walk In" : "Reservation" }} Details of (
             {{ reservation?.get("roomtype")?.value }}-
             {{ reservation?.get("rateName")?.value }})
             {{
@@ -722,13 +731,20 @@
                   >Zip Code is required</small
                 >
               </div>
-              <div class="col mt-3">
+              <div class="col d-flex mt-3">
                 <div *ngFor="let s of guest.get('documents')?.value">
                   <img
                     [src]="s"
                     alt="img"
                     style="height: 100px; width: 100px"
                   />
+                  <i
+                    class="material-symbols-rounded text-danger pt-2"
+                    style="vertical-align: middle; cursor: pointer"
+                    (click)="deletePhotos(s, guest)"
+                  >
+                    delete
+                  </i>
                 </div>
               </div>
             </div>
@@ -756,7 +772,9 @@
               >
                 {{ room.roomName }}
               </option>
+              @if(!isWalkin){
               <option value="assign">assign</option>
+              }
             </select>
 
             <label class="form-label mt-2">
@@ -788,7 +806,7 @@
     [disabled]="groupForm.invalid || reservationForm.invalid"
     (click)="onReserve(confirmReservation)"
   >
-    Reserve
+    {{ isWalkin ? "Check In" : "Reserve" }}
   </button>
   <button
     class="btn btn-primary mt-2 ms-2"

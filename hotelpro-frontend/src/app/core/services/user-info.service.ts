@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import * as CryptoJS from 'crypto-js';
 import { environment } from '../../../environments/environment.development';
+import { BehaviorSubject } from 'rxjs';
 @Injectable({
   providedIn: 'root',
 })
@@ -8,13 +9,21 @@ export class UserInfoService {
   private readonly storageKey = environment.storageKey;
   private readonly encryptionKey = environment.crypto_encryption_Key; // Use a secure key management approach
 
-  setUserInfo(data: any): void {
+  private navBarUpdate = new BehaviorSubject<any>(null);
+  navBarUpdate$ = this.navBarUpdate.asObservable();
+
+  sendNavUpdate(data: any) {
+    this.navBarUpdate.next(data);
+  }
+
+  setUserInfo(data: any, isUpdate?: boolean): void {
     try {
       const encryptedData = CryptoJS.AES.encrypt(
         JSON.stringify(data),
         this.encryptionKey
       ).toString();
       localStorage.setItem(this.storageKey, encryptedData);
+      if (isUpdate) this.sendNavUpdate(true);
     } catch (e) {
       console.error('Error encrypting user info:', e);
     }
@@ -44,7 +53,7 @@ export class UserInfoService {
     const currentInfo = this.getUserInfo();
     if (currentInfo) {
       const updatedInfo = { ...currentInfo, ...updates };
-      this.setUserInfo(updatedInfo);
+      this.setUserInfo(updatedInfo, true);
     }
   }
 }

@@ -26,6 +26,7 @@ export class RoomTypeRangeSetupComponent implements OnInit {
   roomTypeForm!: FormGroup;
   propertyUnitId: string | null = '';
   roomTypeId: string | null = 'ADD';
+  roomCount: number = 0;
 
   constructor(
     private crudService: CrudService,
@@ -47,7 +48,7 @@ export class RoomTypeRangeSetupComponent implements OnInit {
         // roomTypeCategory: ['Room', Validators.required],
         description: [''],
         adultOccupancy: [0, [Validators.min(1), Validators.required]],
-        childOccupancy: [0, Validators.required],
+        childOccupancy: [0, [Validators.min(0), Validators.required]],
         baseRate: [0],
         rooms: this.fb.array([]),
       },
@@ -84,8 +85,8 @@ export class RoomTypeRangeSetupComponent implements OnInit {
   createRoomGroup(data?: any): FormGroup {
     return this.fb.group({
       prefix: [data?.prefix || ''],
-      start: [data?.start || '', Validators.required],
-      end: [data?.end || '', Validators.required],
+      start: [data?.start || 0, Validators.required],
+      end: [data?.end || 0, Validators.required],
     });
   }
 
@@ -154,7 +155,7 @@ export class RoomTypeRangeSetupComponent implements OnInit {
           roomCount += end - start + 1;
         }
       });
-
+      this.roomCount = roomCount;
       return roomCount === totalRooms ? null : { totalRoomsMismatch: true };
     };
   }
