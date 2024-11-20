@@ -42,6 +42,7 @@ export class ReservationInfoComponent implements OnInit {
   roomsData: any[] = [];
   updateDateRateObj: any = {};
   roomTypeRooms: any;
+  isWalkin: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -56,6 +57,8 @@ export class ReservationInfoComponent implements OnInit {
 
   ngOnInit(): void {
     this.propertyUnitId = this.authService.getUserInfo()?.user?.propertyUnitId;
+    this.isWalkin = this.router.url == '/reservation-info' ? false : true;
+
     // this.propertyUnitId = this.route.snapshot.paramMap.get('propertyUnitId');
     this.initializeForms();
     this.loadData();
@@ -75,7 +78,7 @@ export class ReservationInfoComponent implements OnInit {
       totalPrice: [0],
       firstName: ['', [Validators.required, Validators.minLength(2)]],
       lastName: ['', [Validators.required, Validators.minLength(2)]],
-      email: ['', [Validators.required, Validators.email]],
+      email: ['', [Validators.email]],
       phone: [''],
       addressLine1: [''],
       addressLine2: [''],
@@ -162,7 +165,7 @@ export class ReservationInfoComponent implements OnInit {
     return this.fb.group({
       firstName: [guest?.firstName || '', Validators.required],
       lastName: [guest?.lastName || '', Validators.required],
-      email: [guest?.email || '', [Validators.required, Validators.email]],
+      email: [guest?.email || '', [Validators.email]],
       phone: [guest?.phone || ''],
       addressLine1: [guest?.addressLine1 || ''],
       addressLine2: [guest?.addressLine2 || ''],
@@ -277,7 +280,12 @@ export class ReservationInfoComponent implements OnInit {
       'groupDetails',
       JSON.stringify(this.groupForm.value)
     );
-    this.router.navigate([`/reservation-payment`]);
+    if (this.isWalkin) {
+      this.router.navigate([`/walkin-payment`]);
+    } else {
+      this.router.navigate([`/reservation-payment`]);
+    }
+
     this.modalService.dismissAll();
   }
   onReserve(content: TemplateRef<any>): void {
@@ -295,13 +303,16 @@ export class ReservationInfoComponent implements OnInit {
             totalPayment: 0,
             totalDeposit: 0,
           },
+          isWalkin: this.isWalkin,
         };
 
         this.crudService
           .post(APIConstant.CREATE_RESERVATION, sendObj)
           .then((response) => {
             console.log(response);
-            this.alertService.successAlert('Reservation created successfully');
+            this.alertService.successAlert(
+              `${this.isWalkin ? 'Walkin' : 'Reservation'} created successfully`
+            );
             this.router.navigate(['/guest-folio/' + response?.data?._id]);
           })
           .catch((error) => {
@@ -319,21 +330,32 @@ export class ReservationInfoComponent implements OnInit {
   dropped(files: NgxFileDropEntry[], guestForm: AbstractControl) {
     this.files = files;
 
-    // Create a single FormData object for all files
+    // Create a single FormData object for valid files
     const formData = new FormData();
 
     for (const droppedFile of files) {
-      // Is it a file?
+      // Check if it's a file
       if (droppedFile.fileEntry.isFile) {
         const fileEntry = droppedFile.fileEntry as FileSystemFileEntry;
 
         fileEntry.file((file: File) => {
-          // Append each file to the FormData
-          formData.append('uploadedImages', file, droppedFile.relativePath);
+          // Validate file type and size
+          if (this.validateImageFile(file)) {
+            // Append each valid file to the FormData
+            formData.append('uploadedImages', file, droppedFile.relativePath);
+          } else {
+            this.alertService.errorAlert(
+              `Invalid file: ${file.name}. Only image files under 3 MB are allowed.`
+            );
+          }
 
           // After all files have been processed, send the request
           if (files.indexOf(droppedFile) === files.length - 1) {
-            this.uploadPhotos(formData, guestForm);
+            if (formData.has('uploadedImages')) {
+              this.uploadPhotos(formData, guestForm);
+            } else {
+              this.alertService.errorAlert('No valid image files to upload.');
+            }
           }
         });
       } else {
@@ -344,18 +366,56 @@ export class ReservationInfoComponent implements OnInit {
     }
   }
 
+  validateImageFile(file: File): boolean {
+    // Allowed image MIME types
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    const maxSizeInBytes = 3 * 1024 * 1024; // 3 MB
+
+    // Check file type and size
+    return allowedTypes.includes(file.type) && file.size <= maxSizeInBytes;
+  }
+
   uploadPhotos(formData: FormData, guestForm: AbstractControl) {
     this.crudService
       .post(APIConstant.UPLOAD_RESERVATION_IMAGES, formData)
       .then((response) => {
         console.log(response);
         if (response?.data?.images?.length) {
-          guestForm.patchValue({ documents: response?.data?.images });
+          let currentDocuments = guestForm.get('documents')?.value
+            ? guestForm.get('documents')?.value
+            : [];
+
+          guestForm.patchValue({
+            documents: [...currentDocuments, ...response?.data?.images],
+          });
         }
       })
       .catch((error) => {
         this.alertService.errorAlert(
           error?.error?.message || 'An error occurred'
+        );
+        console.error(error);
+      });
+  }
+
+  deletePhotos(imageUrl: any, guestForm: AbstractControl) {
+    this.crudService
+      .post(APIConstant.DELETE_RESERVATION_IMAGES, {
+        imageUrl,
+      })
+      .then((response) => {
+        let currentDocuments = guestForm.get('documents')?.value
+          ? guestForm.get('documents')?.value
+          : [];
+
+        const updatedDocuments = currentDocuments.filter(
+          (doc: string) => doc !== imageUrl
+        );
+        guestForm.patchValue({ documents: updatedDocuments });
+      })
+      .catch((error) => {
+        this.alertService.errorAlert(
+          error?.error?.message || 'An error occurred '
         );
         console.error(error);
       });

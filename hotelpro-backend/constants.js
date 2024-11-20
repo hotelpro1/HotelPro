@@ -42,7 +42,7 @@ export const UserLoginType = {
 export const AvailableUserLoginType = Object.values(UserLoginType);
 
 /**
- * @type {{ RESERVED: "reserved"; INHOUSE: "inhouse"; CANCELLED: "cancelled"; NOSHOW: "noshow"; CHECKEDOUT: "checkedout"} as const}
+ * @type {{ RESERVED: "reserved"; INHOUSE: "inhouse"; CANCELLED: "cancelled"; NOSHOW: "noshow"; CHECKEDOUT: "checkedout"; WALKIN: "walkin"} as const}
  */
 export const ReservationStatusEnum = {
   RESERVED: "reserved",
@@ -50,6 +50,7 @@ export const ReservationStatusEnum = {
   CANCELLED: "cancelled",
   NOSHOW: "noshow",
   CHECKEDOUT: "checkedout",
+  WALKIN: "walkin",
 };
 export const AvailableReservationStatusEnum = Object.values(
   ReservationStatusEnum

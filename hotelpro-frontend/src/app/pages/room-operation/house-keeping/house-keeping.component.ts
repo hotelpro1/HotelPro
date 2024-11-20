@@ -293,7 +293,11 @@ export class HouseKeepingComponent implements OnInit {
   showRooms(event: any) {
     this.dropdownListRoom = [];
     for (let i of this.RoomDetails) {
-      if (i.roomType == event.target.value && i.roomCondition == 'dirty') {
+      if (
+        !i.housekeeperId &&
+        i.roomType == event.target.value &&
+        i.roomCondition == 'dirty'
+      ) {
         this.AssignHousekeepingForm.patchValue({ rooms: [] });
         let obj = {
           item_id: i._id,

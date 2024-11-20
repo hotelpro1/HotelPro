@@ -30,7 +30,8 @@ const getDatesInRange = (startDate, endDate) => {
 const getDateWiseRoomAvailability = async (
   startDate,
   endDate,
-  propertyUnitId
+  propertyUnitId,
+  From
 ) => {
   try {
     const dates = getDatesInRange(startDate, endDate);
@@ -149,14 +150,17 @@ const getDateWiseRoomAvailability = async (
       const occupancy = dates.map((date) => {
         let dayStart = new Date(date);
 
-        const maintenanceRoomIds = maintenanceRooms
-          .filter(
-            (m) =>
-              m.roomTypeId == roomType._id.toString() &&
-              m.startDate <= dayStart &&
-              dayStart < m.endDate
-          )
-          .map((m) => m.roomId);
+        let maintenanceRoomIds = [];
+        if (!(From && From == "yield")) {
+          maintenanceRoomIds = maintenanceRooms
+            .filter(
+              (m) =>
+                m.roomTypeId == roomType._id.toString() &&
+                m.startDate <= dayStart &&
+                dayStart < m.endDate
+            )
+            .map((m) => m.roomId);
+        }
 
         const reservedRoomIds = reservedRooms
           .filter(

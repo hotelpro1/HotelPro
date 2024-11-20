@@ -1,3 +1,5 @@
+<div class="row g-0">
+  <div class="col-9 ps-5 pe-3">
 <div class="m-3">
     <button class="btn btn-outline-success" (click)="openTaxForm(taxModal)">
       Add Tax
@@ -43,7 +45,11 @@
     </button>
   </div>
 </div>
-
+</div>
+<div class="col-3 px-3">
+  <app-property-sidebar></app-property-sidebar>
+</div>
+</div>
 <ng-template #taxModal let-modal>
   <div class="modal-header">
     <h4 class="modal-title" id="modal-basic-title">

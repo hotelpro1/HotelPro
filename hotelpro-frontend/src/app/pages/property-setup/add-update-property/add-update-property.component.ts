@@ -20,6 +20,7 @@ import { AlertService } from '../../../core/services/alert.service';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FileUploadComponent } from '../../../core/reused/file-upload/file-upload.component';
 import { CommonModule } from '@angular/common';
+import { PropertySidebarComponent } from '../property-sidebar/property-sidebar.component';
 
 @Component({
   selector: 'app-add-update-property',
@@ -31,6 +32,7 @@ import { CommonModule } from '@angular/common';
     ReactiveFormsModule,
     NgxFileDropModule,
     FileUploadComponent,
+    PropertySidebarComponent,
   ],
   templateUrl: './add-update-property.component.html',
   styleUrls: ['./add-update-property.component.css'],

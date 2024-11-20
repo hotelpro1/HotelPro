@@ -229,7 +229,9 @@ const getClientDashboard = asyncHandler(async (req, res) => {
           foreignField: "propertyId",
           pipeline: [
             { $match: matchQuery },
-            { $project: { propertyUnitName: 1, active: 1 } },
+            {
+              $project: { propertyUnitName: 1, active: 1, propertyUnitCode: 1 },
+            },
           ],
           as: "propertyunits",
         },

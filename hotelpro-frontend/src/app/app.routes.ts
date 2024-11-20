@@ -55,7 +55,7 @@ export const routes: Routes = [
   {
     path: 'razorpay-demo',
     component: RazorpayFlowComponent,
-    title: 'Razorpay Demo',
+    title: 'Online Payment',
   },
 
   //main components
@@ -132,6 +132,15 @@ export const routes: Routes = [
         canActivate: [authGuard],
       },
       {
+        path: 'policy-setup/:propertyUnitId',
+        loadComponent: () =>
+          import(
+            './pages/property-setup/policy-list/policy-list.component'
+          ).then((m) => m.PolicyListComponent),
+        title: 'Policy Setup',
+        canActivate: [authGuard],
+      },
+      {
         path: 'rooms-review/:propertyUnitId',
         loadComponent: () =>
           import(
@@ -195,6 +204,15 @@ export const routes: Routes = [
         canActivate: [authGuard],
       },
       {
+        path: 'create-walkin',
+        loadComponent: () =>
+          import(
+            './pages/reservation-collection/create-walkin/create-walkin.component'
+          ).then((m) => m.CreateWalkinComponent),
+        title: 'Create Walkin',
+        canActivate: [authGuard],
+      },
+      {
         path: 'reservation-info',
         loadComponent: () =>
           import(
@@ -204,12 +222,30 @@ export const routes: Routes = [
         canActivate: [authGuard],
       },
       {
+        path: 'walkin-info',
+        loadComponent: () =>
+          import(
+            './pages/reservation-collection/reservation-info/reservation-info.component'
+          ).then((m) => m.ReservationInfoComponent),
+        title: 'Walkin Info',
+        canActivate: [authGuard],
+      },
+      {
         path: 'reservation-payment',
         loadComponent: () =>
           import(
             './pages/reservation-collection/create-reservation-payment/create-reservation-payment.component'
           ).then((m) => m.CreateReservationPaymentComponent),
         title: 'Reservation Payment',
+        canActivate: [authGuard],
+      },
+      {
+        path: 'walkin-payment',
+        loadComponent: () =>
+          import(
+            './pages/reservation-collection/create-reservation-payment/create-reservation-payment.component'
+          ).then((m) => m.CreateReservationPaymentComponent),
+        title: 'Walkin Payment',
         canActivate: [authGuard],
       },
       {

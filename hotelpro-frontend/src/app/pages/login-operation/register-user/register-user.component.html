@@ -4,7 +4,7 @@
     <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
       <div class="user__details">
         <div class="input__box">
-          <span class="details">Primary Property Name</span>
+          <span class="details">Primary Property Name*</span>
           <input
             type="text"
             placeholder="Primary Property Name"
@@ -35,7 +35,7 @@
           </div>
         </div>
         <div class="input__box">
-          <span class="details">First Name</span>
+          <span class="details">First Name*</span>
           <input
             type="text"
             placeholder="First Name"
@@ -66,7 +66,7 @@
           </div>
         </div>
         <div class="input__box">
-          <span class="details">Last Name</span>
+          <span class="details">Last Name*</span>
           <input
             type="text"
             placeholder="Last Name"
@@ -97,7 +97,7 @@
           </div>
         </div>
         <div class="input__box">
-          <span class="details">Email</span>
+          <span class="details">Email*</span>
           <input
             type="email"
             placeholder="johnsmith@hotmail.com"
@@ -122,7 +122,7 @@
           </div>
         </div>
         <div class="input__box">
-          <span class="details">Phone Number</span>
+          <span class="details">Phone Number*</span>
           <input
             type="tel"
             placeholder="012-345-6789"
@@ -144,10 +144,14 @@
         </div>
         <div class="input__box" formGroupName="address">
           <span class="details">Street</span>
-          <input type="text" placeholder="Street" formControlName="addressLine1" />
+          <input
+            type="text"
+            placeholder="Street"
+            formControlName="addressLine1"
+          />
         </div>
         <div class="input__box" formGroupName="address">
-          <span class="details">City</span>
+          <span class="details">City*</span>
           <input type="text" placeholder="City" formControlName="city" />
           <div
             *ngIf="
@@ -169,7 +173,7 @@
           </div>
         </div>
         <div class="input__box" formGroupName="address">
-          <span class="details">State</span>
+          <span class="details">State*</span>
           <input type="text" placeholder="State" formControlName="state" />
           <div
             *ngIf="
@@ -196,7 +200,7 @@
           </div>
         </div>
         <div class="input__box" formGroupName="address">
-          <span class="details">ZIP Code</span>
+          <span class="details">ZIP Code*</span>
           <input type="text" placeholder="ZIP Code" formControlName="zipCode" />
           <div
             *ngIf="
@@ -208,8 +212,8 @@
             <small
               class="text-danger"
               *ngIf="userForm.get('address.zipCode')?.errors?.['required']"
-              >ZIP Code is required. <br> </small
-            >
+              >ZIP Code is required. <br />
+            </small>
             <small
               class="text-danger"
               *ngIf="userForm.get('address.zipCode')?.errors?.['zipCode']"
@@ -218,7 +222,7 @@
           </div>
         </div>
         <div class="input__box">
-          <span class="details">Password</span>
+          <span class="details">Password*</span>
           <input
             type="password"
             placeholder="********"
@@ -250,7 +254,7 @@
           </div>
         </div>
         <div class="input__box">
-          <span class="details">Confirm Password</span>
+          <span class="details">Confirm Password*</span>
           <input
             type="password"
             placeholder="********"
@@ -266,8 +270,8 @@
             <small
               class="text-danger"
               *ngIf="userForm.get('confirmpassword')?.errors?.['required']"
-              >Confirm Password is required <br></small
-            >
+              >Confirm Password is required <br
+            /></small>
             <small class="text-danger" *ngIf="userForm.errors?.['mismatch']"
               >Passwords must match</small
             >

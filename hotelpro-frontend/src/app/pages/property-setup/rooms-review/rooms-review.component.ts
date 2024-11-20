@@ -12,11 +12,18 @@ import { AlertService } from '../../../core/services/alert.service';
 import { CrudService } from '../../../core/services/crud.service';
 import { APIConstant } from '../../../core/constants/APIConstant';
 import { CommonModule } from '@angular/common';
+import { PropertySidebarComponent } from '../property-sidebar/property-sidebar.component';
 
 @Component({
   selector: 'app-rooms-review',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    RouterModule,
+    PropertySidebarComponent,
+  ],
   templateUrl: './rooms-review.component.html',
   styleUrls: ['./rooms-review.component.css'],
 })
@@ -190,7 +197,7 @@ export class RoomsReviewComponent implements OnInit {
     return this.expandedRowIndices.has(index);
   }
   next() {
-    this.router.navigate(['/baserate-setup/', this.propertyUnitId]);
+    this.router.navigate(['/policy-setup/', this.propertyUnitId]);
   }
 
   editPropertyUnit() {

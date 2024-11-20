@@ -6,6 +6,7 @@ import {
   YieldRoomType,
   Yield,
   RoomType,
+  RoomMaintenance,
 } from "../../database/database.schema.js";
 import availabilityController from "./availability.controller.js";
 import mongoose from "mongoose";
@@ -389,7 +390,8 @@ const getDateWiseYield = async (
       active: true,
     };
     if (ratePlanId) matchquerry.ratePlanSetupId = new ObjectId(ratePlanId);
-    let [yieldDetails, availability] = await Promise.all([
+
+    let [yieldDetails, availability, roomMaintenance] = await Promise.all([
       Yield.aggregate([
         {
           $match: matchquerry,
@@ -433,8 +435,37 @@ const getDateWiseYield = async (
       availabilityController.getDateWiseRoomAvailability(
         startDate,
         endDate,
-        propertyUnitId
+        propertyUnitId,
+        "yield"
       ),
+      RoomMaintenance.aggregate([
+        {
+          $match: {
+            $and: [
+              {
+                endDate: {
+                  $gt: startDate,
+                },
+              },
+              {
+                startDate: {
+                  $lte: endDate,
+                },
+              },
+              {
+                propertyUnitId: new ObjectId(propertyUnitId),
+              },
+            ],
+          },
+        },
+        {
+          $project: {
+            roomId: 1,
+            startDate: 1,
+            endDate: 1,
+          },
+        },
+      ]),
     ]);
 
     let yieldDateWiseData = [];
@@ -447,14 +478,18 @@ const getDateWiseYield = async (
         if (a._id.toString() == yd.roomTypeId.toString()) {
           for (let o of a.Occupancy) {
             let occupied = a.TotalRoom - o.Available;
-            let occupancyPercentage = (100 * occupied) / a.TotalRoom;
-            // console.log(
-            //   o.Date,
-            //   yd.startDate.getTime() <= new Date(o.Date).getTime(),
-            //   new Date(o.Date).getTime() < yd.endDate.getTime(),
-            //   new Date(o.Date).getTime(),
-            //   yd.endDate.getTime()
-            // );
+
+            // Adjust for room maintenance
+            let maintenanceCount = roomMaintenance.filter(
+              (rm) =>
+                new Date(o.Date).getTime() >=
+                  new Date(rm.startDate).getTime() &&
+                new Date(o.Date).getTime() < new Date(rm.endDate).getTime()
+            ).length;
+
+            let adjustedTotalRoom = a.TotalRoom - maintenanceCount;
+            let occupancyPercentage =
+              adjustedTotalRoom != 0 ? (100 * occupied) / adjustedTotalRoom : 0;
 
             if (
               yd.startDate.getTime() <= new Date(o.Date).getTime() &&

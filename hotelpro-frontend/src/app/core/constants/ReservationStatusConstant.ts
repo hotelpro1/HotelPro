@@ -4,4 +4,5 @@ export const ReservationStatus = {
   cancelled: 'Cancelled',
   noshow: 'No Show',
   checkedout: 'Checked Out',
+  walkin: 'Walk In',
 };

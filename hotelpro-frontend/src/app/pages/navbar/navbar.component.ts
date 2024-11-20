@@ -9,6 +9,7 @@ import { NgbModal, NgbToast } from '@ng-bootstrap/ng-bootstrap';
 import { AsyncPipe, CommonModule, DatePipe, JsonPipe } from '@angular/common';
 import { NotificationSharedService } from '../../core/services/notification-shared.service';
 import { interval, Subscription } from 'rxjs';
+import { UserInfoService } from '../../core/services/user-info.service';
 
 @Component({
   selector: 'app-navbar',
@@ -35,6 +36,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   constructor(
     private authService: AuthService,
     private router: Router,
+    private userServie: UserInfoService,
     private crudService: CrudService,
     private alertService: AlertService,
     private notificationService: NotificationSharedService,
@@ -44,6 +46,13 @@ export class NavbarComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.userInfo = this.authService.getUserInfo()?.user;
     this.readNotifications();
+    this.userServie.navBarUpdate$.subscribe((data: any) => {
+      console.log(data);
+      if (data == true) {
+        this.userInfo = this.authService.getUserInfo()?.user;
+        this.readNotifications();
+      }
+    });
     // this.notificationService.joinToRoom(this.userInfo._id);
 
     // this.notificationService.on('new-notification').subscribe((data) => {
