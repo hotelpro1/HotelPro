@@ -1,0 +1,1 @@
+import{O as n}from"./chunk-W7CJDNGE.js";var s={reserved:"Reserved",inhouse:"In house",cancelled:"Cancelled",noshow:"No Show",checkedout:"Checked Out",walkin:"Walk In"};var u=(()=>{let e=class e{transform(r,...o){return s[r]??r}};e.\u0275fac=function(o){return new(o||e)},e.\u0275pipe=n({name:"status",type:e,pure:!0,standalone:!0});let t=e;return t})();export{u as a};
