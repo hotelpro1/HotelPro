@@ -33,7 +33,6 @@ export class CreateReservationComponent implements OnInit {
   groupForm!: FormGroup;
   roomsData: any[] = [];
   selectedItems: any[] = [];
-  totalGuests: any = { adults: 0, childs: 0 };
   propertyUnitId: string | null = '';
   roomTypeRooms: Record<string, any[]> = {};
   extraGuestsData: any = {
@@ -43,6 +42,7 @@ export class CreateReservationComponent implements OnInit {
     adultRate: 0,
   };
   Today: string = '';
+  isOccupancySufficient: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -52,7 +52,7 @@ export class CreateReservationComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private modalService: NgbModal
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.propertyUnitId = this.authService.getUserInfo()?.user?.propertyUnitId;
@@ -106,6 +106,7 @@ export class CreateReservationComponent implements OnInit {
   }
 
   readRooms(): void {
+    this.isOccupancySufficient = false;
     this.resetGuestTotals();
     this.crudService
       .post(
@@ -124,7 +125,6 @@ export class CreateReservationComponent implements OnInit {
     this.roomsData = [];
     this.selectedItems = [];
     this.roomTypeRooms = {};
-    this.totalGuests = { adults: 0, childs: 0 };
     this.groupForm.patchValue({
       totalCost: 0,
       totalPrice: 0,
@@ -175,6 +175,21 @@ export class CreateReservationComponent implements OnInit {
     this.updateRoomSelection(index, -1);
   }
 
+  trackSelectedRooms() {
+    let x = this.roomsData.reduce((acc: number, room: any) => {
+      return (acc +=
+        room.dropdownSettings.limitSelection *
+        (room.adultOccupant +
+          room.childOccupant +
+          room.extraAdults +
+          room.extraChilds));
+    }, 0);
+    console.log(x);
+    this.isOccupancySufficient =
+      x >=
+      this.groupForm.get('adults')?.value + this.groupForm.get('childs')?.value;
+  }
+
   private updateRoomSelection(index: number, increment: number): void {
     const room = this.roomsData[index];
     room.dropdownSettings = Object.assign({}, room.dropdownSettings, {
@@ -185,9 +200,6 @@ export class CreateReservationComponent implements OnInit {
         element.totalRoom -= increment;
       }
     });
-
-    this.totalGuests.adults += increment * room.adultOccupant;
-    this.totalGuests.childs += increment * room.childOccupant;
 
     this.groupForm.controls.totalCost.patchValue(
       this.groupForm.get('totalCost')?.value + increment * room.roomCost
@@ -203,6 +215,7 @@ export class CreateReservationComponent implements OnInit {
       x.splice(x.length - 1, 1);
       this.selectedItems[index] = Object.assign(x);
     }
+    this.trackSelectedRooms();
   }
 
   trackByFn(index: number, item: any): any {
@@ -279,26 +292,32 @@ export class CreateReservationComponent implements OnInit {
 
     this.modalService.open(content).result.then((result) => {
       if (result) {
-        this.totalGuests.adults -= room.adultOccupant + room.extraAdults;
-        this.totalGuests.childs -= room.childOccupant + room.extraChilds;
         room.extraAdults = Number(this.extraGuestsData.extraAdults);
         room.extraChilds = Number(this.extraGuestsData.extraChilds);
 
-        this.groupForm.controls.totalCost.patchValue(
-          this.groupForm.get('totalCost')?.value - room.roomCost
-        );
-        this.groupForm.controls.totalPrice.patchValue(
-          this.groupForm.get('totalPrice')?.value - room.roomPrice
-        );
-        [room.roomPrice, room.roomCost] = this.calculateRoomCost(room);
-        this.totalGuests.adults += room.adultOccupant + room.extraAdults;
-        this.totalGuests.childs += room.childOccupant + room.extraChilds;
-        this.groupForm.controls.totalCost.patchValue(
-          this.groupForm.get('totalCost')?.value + room.roomCost
-        );
-        this.groupForm.controls.totalPrice.patchValue(
-          this.groupForm.get('totalPrice')?.value + room.roomPrice
-        );
+        if (room.dropdownSettings.limitSelection > 0) {
+          this.groupForm.controls.totalCost.patchValue(
+            this.groupForm.get('totalCost')?.value -
+              room.roomCost * room.dropdownSettings.limitSelection
+          );
+          this.groupForm.controls.totalPrice.patchValue(
+            this.groupForm.get('totalPrice')?.value -
+              room.roomPrice * room.dropdownSettings.limitSelection
+          );
+          [room.roomPrice, room.roomCost] = this.calculateRoomCost(room);
+
+          this.groupForm.controls.totalCost.patchValue(
+            this.groupForm.get('totalCost')?.value +
+              room.roomCost * room.dropdownSettings.limitSelection
+          );
+          this.groupForm.controls.totalPrice.patchValue(
+            this.groupForm.get('totalPrice')?.value +
+              room.roomPrice * room.dropdownSettings.limitSelection
+          );
+        } else {
+          [room.roomPrice, room.roomCost] = this.calculateRoomCost(room);
+        }
+        this.trackSelectedRooms();
       }
     });
   }

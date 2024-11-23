@@ -187,18 +187,10 @@
   <button
     class="btn btn-primary my-3"
     (click)="onSubmit()"
-    [disabled]="
-      totalGuests?.adults + totalGuests?.childs <
-      groupForm.get('adults')?.value + groupForm.get('childs')?.value
-    "
+    [disabled]="!isOccupancySufficient"
   >
     Next
-    <ng-container
-      *ngIf="
-        totalGuests?.adults + totalGuests?.childs >=
-        groupForm.get('adults')?.value + groupForm.get('childs')?.value
-      "
-    >
+    <ng-container *ngIf="isOccupancySufficient">
       (Total Cost {{ groupForm.get("totalCost")?.value?.toFixed(2) }})
     </ng-container>
   </button>
