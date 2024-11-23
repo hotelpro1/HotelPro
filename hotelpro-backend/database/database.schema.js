@@ -923,7 +923,7 @@ const transactionCodeSchema = new Schema(
     },
     paymentType: {
       type: String,
-      enum: ["card", "cash"],
+      enum: ["card", "upi", "cloud", "cash"],
     },
     paymentId: String,
     refundId: String,

@@ -413,10 +413,26 @@ export class GuestFolioComponent implements OnInit {
   }
 
   // Submit the room change request
-  callChangeRoom(newReservation: any, room: any): void {
+  callChangeRoom(newReservation: any, room: any, content: any): void {
     newReservation.room = room;
     newReservation.roomId = room.id;
-
+    if (newReservation.roomTypeId === this.currentReservation.roomTypeId) {
+      this.changeRoom(newReservation);
+    } else {
+      this.openModal(content, {
+        centered: true,
+        backdrop: 'static',
+        keyboard: false,
+      }).then((result) => {
+        if (result) {
+          this.changeRoom(newReservation, true);
+        } else {
+          this.changeRoom(newReservation, false);
+        }
+      });
+    }
+  }
+  changeRoom(newReservation: any, isSameRate = true) {
     this.crudService
       .post(APIConstant.CHANGE_ROOM, {
         groupData: {
@@ -427,6 +443,7 @@ export class GuestFolioComponent implements OnInit {
         propertyUnitId: this.propertyUnitId,
         reservation: newReservation,
         oldReservation: this.currentReservation,
+        isSameRate,
       })
       .then((response: any) => {
         console.log(response);
@@ -441,7 +458,6 @@ export class GuestFolioComponent implements OnInit {
         console.error(error);
       });
   }
-
   // Toggle room charges display
   showRoomCharges(reservation: any): void {
     reservation.showCharges = !reservation.showCharges;
@@ -564,7 +580,6 @@ export class GuestFolioComponent implements OnInit {
         if (
           !curr.isDeposit &&
           !curr.isRefund &&
-          curr.billingCardId &&
           curr?.transactionDetails?.transactionRate > 0
         ) {
           acc += curr?.transactionDetails?.transactionRate;
@@ -644,6 +659,7 @@ export class GuestFolioComponent implements OnInit {
           if (result) {
             this.crudService
               .post(APIConstant.NOSHOW_RESERVATION, {
+                groupId: this.groupId,
                 noshowDetails: this.noshowDetails,
                 reservation: reservation,
                 propertyUnitId: this.propertyUnitId,
@@ -689,6 +705,7 @@ export class GuestFolioComponent implements OnInit {
           if (result) {
             this.crudService
               .post(APIConstant.CANCEL_RESERVATION, {
+                groupId: this.groupId,
                 cancelDetails: this.cancelDetails,
                 reservation: reservation,
                 propertyUnitId: this.propertyUnitId,
@@ -964,6 +981,7 @@ export class GuestFolioComponent implements OnInit {
       .then((response) => {
         console.log(response);
         this.alertService.successAlert(response.message);
+        this.modalService.dismissAll();
         this.loadGroupDetails();
       })
       .catch((error) => {

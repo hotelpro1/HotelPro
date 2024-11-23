@@ -5,7 +5,19 @@
   >
   <form [formGroup]="paymentForm">
     <div class="row">
-      <div class="col-md-4 mt-3 col-9">
+      <div class="col-md-3 mt-3">
+        <label class="form-label">Select Payment Type</label>
+        <select
+          class="form-control select_reason"
+          formControlName="paymentType"
+        >
+          <option value="cash">Cash</option>
+          <option value="upi">UPI</option>
+          <option value="card">Card</option>
+          <option value="cloud">Cloud</option>
+        </select>
+      </div>
+      <div class="col-md-3 mt-3 col-9">
         <label class="form-label">Amount </label>
         <input
           type="number"
@@ -30,7 +42,7 @@
           amount is required
         </small>
       </div>
-      <div class="col-md-2 col-3 mt-3">
+      <div class="col-md-1 col-3 mt-3">
         <div class="mt-4">
           <label class="form-label me-2">Deposit </label>
           <input
@@ -40,7 +52,7 @@
           />
         </div>
       </div>
-      <div class="col-md-4 col-9 mt-3">
+      <div class="col-md-3 col-9 mt-3">
         <label class="form-label">Remark </label>
         <input
           type="text"

@@ -713,7 +713,7 @@
                 <button
                   type="button"
                   class="btn btn-outline-primary"
-                  (click)="callChangeRoom(roomtype, room)"
+                  (click)="callChangeRoom(roomtype, room, confirmChangeRoom)"
                 >
                   Continue
                 </button>
@@ -760,7 +760,9 @@
           formControlName="paymentType"
         >
           <option value="cash">Cash</option>
+          <option value="upi">UPI</option>
           <option value="card">Card</option>
+          <option value="cloud">Cloud</option>
         </select>
       </div>
       <div class="col-md-2 mt-3">
@@ -827,7 +829,7 @@
       <div class="col-md-2 mt-3">
         <div class="d-flex justify-content-center">
           <button
-            *ngIf="paymentForm.get('paymentType')?.value === 'cash'"
+            *ngIf="paymentForm.get('paymentType')?.value != 'cloud'"
             class="btn btn-primary mt-4"
             type="button"
             [disabled]="paymentForm.invalid"
@@ -836,7 +838,7 @@
             Pay
           </button>
           <button
-            *ngIf="paymentForm.get('paymentType')?.value === 'card'"
+            *ngIf="paymentForm.get('paymentType')?.value === 'cloud'"
             class="btn btn-primary mt-4"
             type="button"
             [disabled]="paymentForm.invalid"
@@ -942,12 +944,14 @@
           formControlName="paymentType"
         >
           <option value="cash">Cash</option>
-          <option value="card">Online</option>
+          <option value="upi">UPI</option>
+          <option value="card">Card</option>
+          <option value="cloud">Cloud</option>
         </select>
       </div>
       <div
         class="col-md-3 mt-3"
-        *ngIf="refundForm.get('paymentType')?.value == 'card'"
+        *ngIf="refundForm.get('paymentType')?.value == 'cloud'"
       >
         <label class="form-label">Card</label>
         <select
@@ -1020,7 +1024,7 @@
           <button
             class="btn btn-primary mt-4"
             type="button"
-            *ngIf="refundForm.get('paymentType')?.value == 'cash'"
+            *ngIf="refundForm.get('paymentType')?.value != 'cloud'"
             [disabled]="
               refundForm.invalid ||
               refundForm.get('maxRefund')?.value <
@@ -1033,7 +1037,7 @@
           <button
             class="btn btn-primary mt-4"
             type="button"
-            *ngIf="refundForm.get('paymentType')?.value == 'card'"
+            *ngIf="refundForm.get('paymentType')?.value == 'cloud'"
             [disabled]="
               refundForm.invalid ||
               (cardDetails.extraDetails?.amount -
@@ -1115,11 +1119,12 @@
         placeholder="Enter Capture Amount"
       />
       <br />
-      Release Amount
+      Release Amount @if(depositObj.transactionDetails.captureAmount >= 0 ){
       {{
         depositObj?.transactionDetails?.transactionRate -
           depositObj.transactionDetails.captureAmount
       }}
+      }
     </p>
     <div class="d-flex justify-content-center">
       <button
@@ -1526,6 +1531,30 @@
       (click)="modal.close(false)"
     >
       No
+    </button>
+  </div>
+</ng-template>
+<ng-template #confirmChangeRoom let-modal>
+  <div class="modal-body">
+    <h6 class="modal-title"> Are you sure want to countinue with ? </h6>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-primary" (click)="modal.close(true)">
+      Same Rate
+    </button>
+    <button
+      type="button"
+      class="btn btn-secondary"
+      (click)="modal.close(false)"
+    >
+      New Rate
+    </button>
+    <button
+      type="button"
+      class="btn btn-primary"
+      (click)="modal.dismiss(false)"
+    >
+      Cancel
     </button>
   </div>
 </ng-template>
