@@ -140,11 +140,11 @@
             class="link text-primary"
             (click)="openExtraModal(extraGuests, room)"
           >
-            {{
-              room.extraAdults == 0 && room.extraChilds == 0
-                ? "add"
-                : "(" + room.extraAdults + "/" + room.extraChilds + ")"
-            }}
+            @if( room.extraAdults == 0 && room.extraChilds == 0 ){
+            <i class="material-symbols-rounded">person_add</i>
+            }@else {
+            {{ "(" + room.extraAdults + "/" + room.extraChilds + ")" }}
+            }
           </span>
         </td>
         <td>{{ room?.roomPrice?.toFixed(2) }}</td>
@@ -157,9 +157,7 @@
               room?.dropdownSettings?.limitSelection >= room.totalRoom
             "
           >
-            <i class="material-symbols-rounded" style="vertical-align: middle"
-              >add</i
-            >
+            <i class="material-symbols-rounded">add</i>
           </button>
           <span class="mx-1">{{ room?.dropdownSettings?.limitSelection }}</span>
           <button
@@ -167,9 +165,7 @@
             (click)="removeRoomCount(i)"
             [disabled]="room?.dropdownSettings?.limitSelection === 0"
           >
-            <i class="material-symbols-rounded" style="vertical-align: middle"
-              >remove</i
-            >
+            <i class="material-symbols-rounded">remove</i>
           </button>
         </td>
         <td>

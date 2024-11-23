@@ -33,7 +33,7 @@
               Customer Details:
               <i
                 class="material-symbols-rounded"
-                style="vertical-align: middle; font-size: 20px"
+                style="font-size: 20px"
                 (click)="
                   openGuestForm(
                     guestModal,
@@ -72,9 +72,27 @@
               <span class="fw-semibold">
                 {{
                   groupDetails?.customerDetails?.customerAddress?.addressLine1
-                }}, {{ groupDetails?.customerDetails?.customerAddress?.city }},
-                {{ groupDetails?.customerDetails?.customerAddress?.state }},
-                {{ groupDetails?.customerDetails?.customerAddress?.country }},
+                    ? groupDetails?.customerDetails?.customerAddress
+                        ?.addressLine1 + ","
+                    : ""
+                }}
+                {{
+                  groupDetails?.customerDetails?.customerAddress?.city
+                    ? groupDetails?.customerDetails?.customerAddress?.city + ","
+                    : ""
+                }}
+                {{
+                  groupDetails?.customerDetails?.customerAddress?.state
+                    ? groupDetails?.customerDetails?.customerAddress?.state +
+                      ","
+                    : ""
+                }}
+                {{
+                  groupDetails?.customerDetails?.customerAddress?.country
+                    ? groupDetails?.customerDetails?.customerAddress?.country +
+                      ","
+                    : ""
+                }}
                 {{ groupDetails?.customerDetails?.customerAddress?.zipCode }}
               </span>
             </label>
@@ -212,7 +230,7 @@
             </span>
             <i
               class="material-symbols-rounded ms-1"
-              style="vertical-align: middle; font-size: 20px"
+              style="font-size: 20px"
               (click)="
                 openGuestForm(
                   guestModal,
@@ -226,10 +244,7 @@
             >
               edit
             </i>
-            <i
-              class="material-symbols-rounded"
-              style="vertical-align: middle; font-size: 20px"
-            >
+            <i class="material-symbols-rounded" style="font-size: 20px">
               group
             </i>
           </label>
@@ -251,10 +266,26 @@
           <label class="form-label">
             Address:
             <span class="fw-semibold">
-              {{ reservation?.guestDetails?.guestAddress?.addressLine1 }},
-              {{ reservation?.guestDetails?.guestAddress?.city }},
-              {{ reservation?.guestDetails?.guestAddress?.state }},
-              {{ reservation?.guestDetails?.guestAddress?.country }},
+              {{
+                reservation?.guestDetails?.guestAddress?.addressLine1
+                  ? reservation?.guestDetails?.guestAddress?.addressLine1 + ","
+                  : ""
+              }}
+              {{
+                reservation?.guestDetails?.guestAddress?.city
+                  ? reservation?.guestDetails?.guestAddress?.city + ","
+                  : ""
+              }}
+              {{
+                reservation?.guestDetails?.guestAddress?.state
+                  ? reservation?.guestDetails?.guestAddress?.state + ","
+                  : ""
+              }}
+              {{
+                reservation?.guestDetails?.guestAddress?.country
+                  ? reservation?.guestDetails?.guestAddress?.country + ","
+                  : ""
+              }}
               {{ reservation?.guestDetails?.guestAddress?.zipCode }}
             </span>
           </label>
@@ -276,7 +307,7 @@
               {{ s?.firstName }} {{ s?.lastName }}
               <i
                 class="material-symbols-rounded ms-1"
-                style="vertical-align: middle; font-size: 20px"
+                style="font-size: 20px"
                 (click)="
                   openGuestForm(
                     guestModal,
@@ -1425,10 +1456,7 @@
                 (click)="openFileSelector()"
                 style="cursor: pointer"
                 >Add
-                <i
-                  class="material-symbols-rounded"
-                  style="vertical-align: middle; font-size: 20px"
-                >
+                <i class="material-symbols-rounded" style="font-size: 20px">
                   file_present</i
                 ></a
               >
@@ -1450,7 +1478,6 @@
 
             <i
               class="material-symbols-rounded text-danger pt-2"
-              style="vertical-align: middle; cursor: pointer"
               (click)="deletePhotos(s)"
             >
               delete

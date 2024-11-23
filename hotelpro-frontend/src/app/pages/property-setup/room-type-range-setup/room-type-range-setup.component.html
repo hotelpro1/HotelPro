@@ -257,7 +257,6 @@
           </span>
           <i
             class="material-symbols-rounded text-danger"
-            style="vertical-align: middle; cursor: pointer"
             (click)="removeRoom(i)"
           >
             delete
@@ -268,12 +267,7 @@
     <div class="row mt-3" *ngIf="roomTypeId == 'ADD'">
       <div class="col-md-2">
         <button type="button" class="btn btn-primary" (click)="addRoom()">
-          <i
-            class="material-symbols-rounded"
-            style="vertical-align: middle; cursor: pointer"
-          >
-            add
-          </i>
+          <i class="material-symbols-rounded"> add </i>
           Add Room
         </button>
       </div>
