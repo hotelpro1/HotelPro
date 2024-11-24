@@ -6,4 +6,6 @@ const router = express.Router();
 
 router.post("/get-superadmin-dashboard", adminIndex.readSuperAdminDashboard);
 
+router.post("/get-monthly-report", adminIndex.readMonthlyReport);
+
 export default router;
