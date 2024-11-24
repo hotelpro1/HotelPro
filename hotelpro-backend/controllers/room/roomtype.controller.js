@@ -11,6 +11,7 @@ import {
 import mongoose from "mongoose";
 import {
   AvailableRateTypeEnum,
+  RateTypeEnum,
   RoomConditionEnum,
   RoomStatusEnum,
 } from "../../constants.js";
@@ -202,7 +203,7 @@ const createRoomTypeWithRooms = asyncHandler(async (req, res) => {
     const roomTypeRate = new RatePlanRoomRate({
       ratePlanRoomDetailId: rateRoomType._id,
       rateType: ratetype,
-      baseRate: baseRate ? baseRate : 0,
+      baseRate: baseRate && ratetype == RateTypeEnum.BASERATE ? baseRate : 0,
     });
 
     rateEntries.push(roomTypeRate);

@@ -4,6 +4,8 @@ import { ApiResponse } from "../../utils/ApiResponse.js";
 import {
   Reservation,
   ReservationDetail,
+  RoomBalance,
+  GroupReservation,
 } from "../../database/database.schema.js";
 import mongoose from "mongoose";
 const ObjectId = mongoose.Types.ObjectId;
@@ -11,6 +13,7 @@ import {
   UserTypesEnum,
   ReservationStatusEnum,
   ChangeValueEnum,
+  BalanceNameEnum,
 } from "../../constants.js";
 import {
   checkAndAllocateRoom,
@@ -104,7 +107,7 @@ const calculatePenalty = (details) => {
 
 // Mark reservation as no-show
 const noShowReservation = asyncHandler(async (req, res) => {
-  const { reservation } = req.body;
+  const { reservation, groupId, noshowDetails } = req.body;
   const reservationId = new ObjectId(reservation._id);
 
   if (reservation.roomId && reservation.roomLockId) {
@@ -115,27 +118,65 @@ const noShowReservation = asyncHandler(async (req, res) => {
       throw prepareInternalError("Error while deallocating room!");
     }
   }
+  if (noshowDetails.penalty > 0) {
+    let roomBalance = new RoomBalance();
+    roomBalance.balance = -noshowDetails.penalty; // Negative charge for balance
+    roomBalance.balanceDate = Date.now();
+    roomBalance.balanceName = BalanceNameEnum.ROOMSERVICES; // Set balance name
 
-  await Promise.all([
-    Reservation.updateOne(
-      {
-        _id: reservationId,
-      },
-      {
-        $set: {
-          reservationStatus: ReservationStatusEnum.NOSHOW,
+    await Promise.all([
+      GroupReservation.updateOne(
+        { _id: groupId },
+        {
+          $inc: {
+            totalBalance: roomBalance.balance,
+            totalExtraCharge: noshowDetails.penalty,
+          },
+        }
+      ),
+      roomBalance.save(),
+      Reservation.updateOne(
+        {
+          _id: reservationId,
         },
-      }
-    ),
-    ReservationDetail.updateOne(
-      { reservationId: reservationId },
-      {
-        $set: {
-          noShowDate: Date.now(),
+        {
+          $set: {
+            reservationStatus: ReservationStatusEnum.NOSHOW,
+          },
+        }
+      ),
+      ReservationDetail.updateOne(
+        { reservationId: reservationId },
+        {
+          $set: {
+            noShowDate: Date.now(),
+            roomExtraCharge: noshowDetails.penalty,
+          },
+        }
+      ),
+    ]);
+  } else {
+    await Promise.all([
+      Reservation.updateOne(
+        {
+          _id: reservationId,
         },
-      }
-    ),
-  ]);
+        {
+          $set: {
+            reservationStatus: ReservationStatusEnum.NOSHOW,
+          },
+        }
+      ),
+      ReservationDetail.updateOne(
+        { reservationId: reservationId },
+        {
+          $set: {
+            noShowDate: Date.now(),
+          },
+        }
+      ),
+    ]);
+  }
 
   return res
     .status(200)
@@ -242,7 +283,7 @@ const calculateCancellationPenalty = (details) => {
 
 // Cancel a reservation
 const cancelReservation = asyncHandler(async (req, res) => {
-  const { reservation } = req.body;
+  const { reservation, cancelDetails } = req.body;
   const reservationId = new ObjectId(reservation._id);
   const groupId = new ObjectId(reservation.groupId);
 
@@ -255,26 +296,65 @@ const cancelReservation = asyncHandler(async (req, res) => {
     }
   }
 
-  await Promise.all([
-    Reservation.updateOne(
-      {
-        _id: reservationId,
-      },
-      {
-        $set: {
-          reservationStatus: ReservationStatusEnum.CANCELLED,
+  if (cancelDetails.penalty > 0) {
+    let roomBalance = new RoomBalance();
+    roomBalance.balance = -cancelDetails.penalty; // Negative charge for balance
+    roomBalance.balanceDate = Date.now();
+    roomBalance.balanceName = BalanceNameEnum.ROOMSERVICES; // Set balance name
+
+    await Promise.all([
+      GroupReservation.updateOne(
+        { _id: groupId },
+        {
+          $inc: {
+            totalBalance: roomBalance.balance,
+            totalExtraCharge: cancelDetails.penalty,
+          },
+        }
+      ),
+      roomBalance.save(),
+      Reservation.updateOne(
+        {
+          _id: reservationId,
         },
-      }
-    ),
-    ReservationDetail.updateOne(
-      { reservationId: reservationId },
-      {
-        $set: {
-          cancellationDate: Date.now(),
+        {
+          $set: {
+            reservationStatus: ReservationStatusEnum.CANCELLED,
+          },
+        }
+      ),
+      ReservationDetail.updateOne(
+        { reservationId: reservationId },
+        {
+          $set: {
+            cancellationDate: Date.now(),
+            roomExtraCharge: cancelDetails.penalty,
+          },
+        }
+      ),
+    ]);
+  } else {
+    await Promise.all([
+      Reservation.updateOne(
+        {
+          _id: reservationId,
         },
-      }
-    ),
-  ]);
+        {
+          $set: {
+            reservationStatus: ReservationStatusEnum.CANCELLED,
+          },
+        }
+      ),
+      ReservationDetail.updateOne(
+        { reservationId: reservationId },
+        {
+          $set: {
+            cancellationDate: Date.now(),
+          },
+        }
+      ),
+    ]);
+  }
 
   return res
     .status(200)

@@ -25,239 +25,294 @@ const getTapechart = asyncHandler(async (req, res) => {
   endDate = new Date(endDate);
   endDate.setUTCHours(0, 0, 0, 0);
 
-  let [tapechartData, rateData, baseRatePlan] = await Promise.all([
-    RoomType.aggregate([
-      {
-        $match: {
-          propertyUnitId: new ObjectId(propertyUnitId),
+  let [tapechartData, rateData, baseRatePlan, unAssignReservations] =
+    await Promise.all([
+      RoomType.aggregate([
+        {
+          $match: {
+            propertyUnitId: new ObjectId(propertyUnitId),
+          },
         },
-      },
-      {
-        $lookup: {
-          from: "rooms",
-          localField: "_id",
-          foreignField: "roomTypeId",
-          as: "roomDetails",
-          pipeline: [
-            {
-              $lookup: {
-                from: "reservations",
-                localField: "_id",
-                foreignField: "roomId",
-                as: "reservation",
-                pipeline: [
-                  {
-                    $match: {
-                      $and: [
-                        {
-                          departure: {
-                            $gt: startDate,
+        {
+          $lookup: {
+            from: "rooms",
+            localField: "_id",
+            foreignField: "roomTypeId",
+            as: "roomDetails",
+            pipeline: [
+              {
+                $lookup: {
+                  from: "reservations",
+                  localField: "_id",
+                  foreignField: "roomId",
+                  as: "reservation",
+                  pipeline: [
+                    {
+                      $match: {
+                        $and: [
+                          {
+                            departure: {
+                              $gt: startDate,
+                            },
                           },
-                        },
-                        {
-                          arrival: {
-                            $lt: endDate,
+                          {
+                            arrival: {
+                              $lt: endDate,
+                            },
                           },
-                        },
-                        {
-                          propertyUnitId: new ObjectId(propertyUnitId),
-                        },
-                        {
-                          $or: [
-                            {
-                              reservationStatus: ReservationStatusEnum.INHOUSE,
-                            },
-                            {
-                              reservationStatus: ReservationStatusEnum.RESERVED,
-                            },
-                            {
-                              reservationStatus:
-                                ReservationStatusEnum.CHECKEDOUT,
-                            },
-                          ],
-                        },
-                      ],
-                    },
-                  },
-                  {
-                    $lookup: {
-                      from: "users",
-                      localField: "userId",
-                      foreignField: "_id",
-                      as: "userDetail",
-                    },
-                  },
-                  {
-                    $unwind: {
-                      path: "$userDetail",
-                    },
-                  },
-                  {
-                    $project: {
-                      arrival: 1,
-                      departure: 1,
-                      tantative: 1,
-                      reservationStatus: 1,
-                      guestName: {
-                        $concat: [
-                          "$userDetail.firstName",
-                          " ",
-                          "$userDetail.lastName",
+                          {
+                            propertyUnitId: new ObjectId(propertyUnitId),
+                          },
+                          {
+                            $or: [
+                              {
+                                reservationStatus:
+                                  ReservationStatusEnum.INHOUSE,
+                              },
+                              {
+                                reservationStatus:
+                                  ReservationStatusEnum.RESERVED,
+                              },
+                              {
+                                reservationStatus:
+                                  ReservationStatusEnum.CHECKEDOUT,
+                              },
+                            ],
+                          },
                         ],
                       },
                     },
-                  },
-                ],
+                    {
+                      $lookup: {
+                        from: "users",
+                        localField: "userId",
+                        foreignField: "_id",
+                        as: "userDetail",
+                      },
+                    },
+                    {
+                      $unwind: {
+                        path: "$userDetail",
+                      },
+                    },
+                    {
+                      $project: {
+                        arrival: 1,
+                        departure: 1,
+                        tantative: 1,
+                        reservationStatus: 1,
+                        guestName: {
+                          $concat: [
+                            "$userDetail.firstName",
+                            " ",
+                            "$userDetail.lastName",
+                          ],
+                        },
+                      },
+                    },
+                  ],
+                },
               },
-            },
-            {
-              $lookup: {
-                from: "roommaintenances",
-                localField: "_id",
-                foreignField: "roomId",
-                as: "maintenance",
-                pipeline: [
-                  {
-                    $match: {
-                      $and: [
-                        {
-                          endDate: {
-                            $gt: startDate,
+              {
+                $lookup: {
+                  from: "roommaintenances",
+                  localField: "_id",
+                  foreignField: "roomId",
+                  as: "maintenance",
+                  pipeline: [
+                    {
+                      $match: {
+                        $and: [
+                          {
+                            endDate: {
+                              $gt: startDate,
+                            },
                           },
-                        },
-                        {
-                          startDate: {
-                            $lt: endDate,
+                          {
+                            startDate: {
+                              $lt: endDate,
+                            },
                           },
-                        },
-                        {
-                          propertyUnitId: new ObjectId(propertyUnitId),
-                        },
-                        {
-                          isCompleted: false,
-                        },
-                      ],
+                          {
+                            propertyUnitId: new ObjectId(propertyUnitId),
+                          },
+                          {
+                            isCompleted: false,
+                          },
+                        ],
+                      },
                     },
-                  },
-                  {
-                    $project: {
-                      startDate: 1,
-                      endDate: 1,
-                      reason: 1,
+                    {
+                      $project: {
+                        startDate: 1,
+                        endDate: 1,
+                        reason: 1,
+                      },
                     },
-                  },
-                ],
+                  ],
+                },
               },
-            },
-            {
-              $project: {
-                roomName: 1,
-                roomCondition: 1,
-                reservation: 1,
-                maintenance: 1,
+              {
+                $project: {
+                  roomName: 1,
+                  roomCondition: 1,
+                  reservation: 1,
+                  maintenance: 1,
+                },
               },
-            },
-          ],
-        },
-      },
-      {
-        $project: {
-          _id: 0,
-          roomTypeId: { $toString: "$_id" },
-          roomTypeName: 1,
-          roomDetails: 1,
-        },
-      },
-    ]),
-    RoomType.aggregate([
-      {
-        $match: {
-          propertyUnitId: new ObjectId(propertyUnitId),
-        },
-      },
-      {
-        $lookup: {
-          from: "rateplanroomtypes",
-          localField: "_id",
-          foreignField: "roomTypeId",
-          as: "rateRoomTypes",
-          pipeline: [
-            {
-              $lookup: {
-                from: "rateplansetups",
-                localField: "ratePlanSetupId",
-                foreignField: "_id",
-                as: "rateSetup",
-              },
-            },
-            {
-              $unwind: {
-                path: "$rateSetup",
-                preserveNullAndEmptyArrays: true,
-              },
-            },
-            {
-              $addFields: {
-                ratePlanName: "$rateSetup.ratePlanName",
-              },
-            },
-            {
-              $unset: "rateSetup",
-            },
-            {
-              $lookup: {
-                from: "rateplanroomrates",
-                localField: "_id",
-                foreignField: "ratePlanRoomDetailId",
-                as: "roomTypeRates",
-                pipeline: [
-                  {
-                    $match: {
-                      rateType: "baseRate",
-                    },
-                  },
-                ],
-              },
-            },
-            {
-              $unwind: {
-                path: "$roomTypeRates",
-              },
-            },
-            {
-              $lookup: {
-                from: "rateplanroomdaterates",
-                localField: "_id",
-                foreignField: "ratePlanRoomRateId",
-                as: "dateRates",
-              },
-            },
-          ],
-        },
-      },
-      {
-        $unwind: {
-          path: "$rateRoomTypes",
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $project: {
-          _id: 0,
-          roomTypeId: {
-            $toString: "$_id",
+            ],
           },
-          baseRate: "$rateRoomTypes.roomTypeRates.baseRate",
-          dateRate: "$rateRoomTypes.dateRates",
         },
-      },
-    ]),
-    RatePlanSetup.findOne({
-      active: true,
-      isBaseRate: true,
-      propertyUnitId,
-    }),
-  ]);
+        {
+          $project: {
+            _id: 0,
+            roomTypeId: { $toString: "$_id" },
+            roomTypeName: 1,
+            roomDetails: 1,
+          },
+        },
+      ]),
+      RoomType.aggregate([
+        {
+          $match: {
+            propertyUnitId: new ObjectId(propertyUnitId),
+          },
+        },
+        {
+          $lookup: {
+            from: "rateplanroomtypes",
+            localField: "_id",
+            foreignField: "roomTypeId",
+            as: "rateRoomTypes",
+            pipeline: [
+              {
+                $lookup: {
+                  from: "rateplansetups",
+                  localField: "ratePlanSetupId",
+                  foreignField: "_id",
+                  as: "rateSetup",
+                },
+              },
+              {
+                $unwind: {
+                  path: "$rateSetup",
+                  preserveNullAndEmptyArrays: true,
+                },
+              },
+              {
+                $addFields: {
+                  ratePlanName: "$rateSetup.ratePlanName",
+                },
+              },
+              {
+                $unset: "rateSetup",
+              },
+              {
+                $lookup: {
+                  from: "rateplanroomrates",
+                  localField: "_id",
+                  foreignField: "ratePlanRoomDetailId",
+                  as: "roomTypeRates",
+                  pipeline: [
+                    {
+                      $match: {
+                        rateType: "baseRate",
+                      },
+                    },
+                  ],
+                },
+              },
+              {
+                $unwind: {
+                  path: "$roomTypeRates",
+                },
+              },
+              {
+                $lookup: {
+                  from: "rateplanroomdaterates",
+                  localField: "_id",
+                  foreignField: "ratePlanRoomRateId",
+                  as: "dateRates",
+                },
+              },
+            ],
+          },
+        },
+        {
+          $unwind: {
+            path: "$rateRoomTypes",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            roomTypeId: {
+              $toString: "$_id",
+            },
+            baseRate: "$rateRoomTypes.roomTypeRates.baseRate",
+            dateRate: "$rateRoomTypes.dateRates",
+          },
+        },
+      ]),
+      RatePlanSetup.findOne({
+        active: true,
+        isBaseRate: true,
+        propertyUnitId,
+      }),
+      Reservation.aggregate([
+        {
+          $match: {
+            $and: [
+              {
+                departure: {
+                  $gt: startDate,
+                },
+              },
+              {
+                arrival: {
+                  $lt: endDate,
+                },
+              },
+              {
+                propertyUnitId: new ObjectId(propertyUnitId),
+              },
+              {
+                reservationStatus: ReservationStatusEnum.RESERVED,
+              },
+              {
+                tentative: true,
+              },
+            ],
+          },
+        },
+        {
+          $lookup: {
+            from: "users",
+            localField: "userId",
+            foreignField: "_id",
+            as: "userDetail",
+          },
+        },
+        {
+          $unwind: {
+            path: "$userDetail",
+          },
+        },
+        {
+          $project: {
+            arrival: 1,
+            departure: 1,
+            tantative: 1,
+            reservationStatus: 1,
+            groupId: 1,
+            guestName: {
+              $concat: ["$userDetail.firstName", " ", "$userDetail.lastName"],
+            },
+          },
+        },
+      ]),
+    ]);
 
   let yieldData = await yieldController.getDateWiseYield(
     startDate,
@@ -313,11 +368,16 @@ const getTapechart = asyncHandler(async (req, res) => {
     }));
   }
 
-  return res
-    .status(200)
-    .json(
-      new ApiResponse(200, tapechartData, "Tapechart data fetched successfully")
-    );
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      {
+        tapechartData,
+        unAssignReservations,
+      },
+      "Tapechart data fetched successfully"
+    )
+  );
 });
 
 export default {

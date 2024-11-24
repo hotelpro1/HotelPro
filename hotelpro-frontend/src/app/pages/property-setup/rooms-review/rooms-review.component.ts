@@ -154,7 +154,7 @@ export class RoomsReviewComponent implements OnInit {
         this.alertService.successAlert(response.message);
       })
       .catch((error: any) => {
-        this.alertService.errorAlert(error.message);
+        this.alertService.errorAlert(error?.error.message);
         console.log(error);
       });
   }

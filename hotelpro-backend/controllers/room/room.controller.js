@@ -46,7 +46,7 @@ const updateRoomById = asyncHandler(async (req, res) => {
   const { roomId } = req.params;
   const { roomName, roomNumber, roomTypeId, roomStatus, roomCondition, dnd } =
     req.body;
-  const roomExist = await Room.find({
+  const roomExist = await Room.findOne({
     roomName,
     roomNumber,
     roomTypeId,

@@ -202,6 +202,10 @@ export class NavbarComponent implements OnInit, OnDestroy {
     let el = document?.getElementById('notificationId');
     if (el) el.classList.remove('show');
   }
+  gotoDashboard() {
+    this.router.navigate([`/${this.userInfo?.userType}-dashboard`]);
+  }
+
   ngOnDestroy(): void {
     if (this.pollingSubscription) {
       this.pollingSubscription.unsubscribe();

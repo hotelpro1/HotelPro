@@ -82,7 +82,7 @@ const postReservationPayment = asyncHandler(async (req, res) => {
   }
 
   const promiseArray = [];
-  if (payment.paymentType === "cash") {
+  if (payment.paymentType != "cloud") {
     const transactionCode = new TransactionCode({
       transactionCode: String(new ObjectId()),
       transactionType: "Reservation",
@@ -103,7 +103,7 @@ const postReservationPayment = asyncHandler(async (req, res) => {
       billingAccountId: billing_account._id,
     });
     promiseArray.push(guestTransaction.save());
-  } else if (payment.paymentType === "card") {
+  } else {
     const isPaymentVerified = await razorPayController.isPaymentVerifiedFunc(
       original_order_id,
       razorpay_payment_id,
@@ -181,7 +181,7 @@ const refundPayment = asyncHandler(async (req, res) => {
   let billing_account = await BillingAccount.findOne({ groupId });
   const promiseArray = [];
 
-  if (payment.paymentType === "cash") {
+  if (payment.paymentType != "cloud") {
     payment.amount = -payment.amount; // Negate amount for refund
     const transactionCode = new TransactionCode({
       transactionCode: String(new ObjectId()),
@@ -203,7 +203,7 @@ const refundPayment = asyncHandler(async (req, res) => {
       billingAccountId: billing_account._id,
     });
     promiseArray.push(guestTransaction.save());
-  } else if (payment.paymentType === "card") {
+  } else {
     const billing_card = await BillingCard.findOne({
       paymentId: payment.payId,
     });
