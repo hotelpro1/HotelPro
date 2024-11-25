@@ -464,7 +464,7 @@ const createReservation = asyncHandler(async (req, res) => {
       });
       if (paymentEntries) {
         paymentEntries.forEach((payment) => {
-          if (payment.paymentType === "cash") {
+          if (payment.paymentType != "cloud") {
             let transactionCode = new TransactionCode({
               transactionCode: String(new ObjectId()),
               transactionType: "Reservation",
@@ -2261,8 +2261,13 @@ const changeRoomReservation = asyncHandler(async (req, res) => {
     await session.withTransaction(async () => {
       console.log("Transaction started");
 
-      let { groupData, reservation, oldReservation, propertyUnitId } = req.body;
-
+      let {
+        groupData,
+        reservation,
+        oldReservation,
+        propertyUnitId,
+        isSameRate,
+      } = req.body;
       if (transaction_retry_count > 0) {
         console.log("In retry");
         await deallocateMultipleRooms(AllInsertedRoomLockIds);
@@ -2456,118 +2461,84 @@ const changeRoomReservation = asyncHandler(async (req, res) => {
         }
       }
 
-      let RoomBalanceEntries = [];
-      let reservationObj = oldReservation;
-      reservationObj = {
-        ...reservation,
-        propertyUnitId,
-        groupId: groupData._id,
-        arrival: groupData.arrival,
-        departure: groupData.departure,
-      };
+      if (!isSameRate) {
+        let RoomBalanceEntries = [];
+        let gt = {
+          totalCost: -oldReservation.reservationDetails.roomCost,
+          totalBalance: oldReservation.reservationDetails.roomCost,
+          totalPrice:
+            -oldReservation.reservationDetails.roomCost /
+            (1 + Number(oldReservation.taxPercentage) / 100),
+          totalTax: 0,
+        };
 
-      let reservationDetailObj = {
-        reservationId: reservationObj._id,
-        adults: reservation.adultOccupant + reservation.extraAdults,
-        childs: reservation.childOccupant + reservation.extraChilds,
-      };
+        gt.totalTax =
+          (gt.totalPrice * Number(oldReservation.taxPercentage)) / 100;
 
-      let gt = {
-        totalCost: -oldReservation.reservationDetails.roomCost,
-        totalBalance: oldReservation.reservationDetails.roomCost,
-        totalPrice:
-          -oldReservation.reservationDetails.roomCost /
-          (1 + Number(oldReservation.taxPercentage) / 100),
-        totalTax: 0,
-      };
-
-      gt.totalTax =
-        (gt.totalPrice * Number(oldReservation.taxPercentage)) / 100;
-
-      reservation.dateRate.forEach((rate) => {
-        let rb = new RoomBalance({
-          balanceDate: rate.date,
-          reservationId: oldReservation._id,
-          balance: -(
-            rate.baseRate +
-            reservation.extraAdults * rate.adultRate +
-            reservation.extraChilds * rate.childRate
-          ),
-          roomId: reservation.roomId,
-        });
-        gt.totalPrice += -rb.balance;
-        RoomBalanceEntries.push(rb);
-
-        let rbtax = new RoomBalance({
-          balanceDate: rate.date,
-          reservationId: oldReservation._id,
-          balanceName: BalanceNameEnum.TAX,
-          balance:
-            (-(
+        reservation.dateRate.forEach((rate) => {
+          let rb = new RoomBalance({
+            balanceDate: rate.date,
+            reservationId: oldReservation._id,
+            balance: -(
               rate.baseRate +
               reservation.extraAdults * rate.adultRate +
               reservation.extraChilds * rate.childRate
-            ) *
-              reservation.taxPercentage) /
-            100,
-          roomId: reservation.roomId,
+            ),
+            roomId: reservation.roomId,
+          });
+          gt.totalPrice += -rb.balance;
+          RoomBalanceEntries.push(rb);
+
+          let rbtax = new RoomBalance({
+            balanceDate: rate.date,
+            reservationId: oldReservation._id,
+            balanceName: BalanceNameEnum.TAX,
+            balance:
+              (-(
+                rate.baseRate +
+                reservation.extraAdults * rate.adultRate +
+                reservation.extraChilds * rate.childRate
+              ) *
+                reservation.taxPercentage) /
+              100,
+            roomId: reservation.roomId,
+          });
+          gt.totalTax += -rbtax.balance;
+          RoomBalanceEntries.push(rbtax);
         });
-        gt.totalTax += -rbtax.balance;
-        RoomBalanceEntries.push(rbtax);
-      });
 
-      gt.totalCost = gt.totalPrice + gt.totalTax;
-      gt.totalBalance = -gt.totalCost;
-
-      try {
-        console.log("Deleting room balance entries...");
+        gt.totalCost = gt.totalPrice + gt.totalTax;
+        gt.totalBalance = -gt.totalCost;
         await RoomBalance.deleteMany(
           { reservationId: oldReservation._id },
           { session }
         );
-      } catch (error) {
-        console.error("Error deleting room balance entries:", error);
-        throw error;
-      }
-
-      try {
-        console.log("Saving group data...");
-        await GroupReservation.updateOne(
-          { _id: groupData._id },
-          {
-            $inc: gt,
-          }
-        );
-      } catch (error) {
-        console.error("Error saving group data:", error);
-        throw error;
-      }
-
-      try {
-        console.log("Saving reservation entries...");
-        await Reservation.updateOne({ _id: oldReservation._id }, reservation);
-      } catch (error) {
-        console.error("Error saving reservation entries:", error);
-        throw error;
-      }
-
-      try {
-        console.log("Saving reservation detail entries...");
-        await ReservationDetail.updateOne(
-          { reservationId: oldReservation._id },
-          reservation
-        );
-      } catch (error) {
-        console.error("Error saving reservation detail entries:", error);
-        throw error;
-      }
-
-      try {
-        console.log("Saving room balance entries...");
-        await RoomBalance.insertMany(RoomBalanceEntries, { session });
-      } catch (error) {
-        console.error("Error saving room balance entries:", error);
-        throw error;
+        try {
+          await Promise.all([
+            GroupReservation.updateOne(
+              { _id: groupData.groupId },
+              {
+                $inc: gt,
+              }
+            ),
+            Reservation.updateOne({ _id: oldReservation._id }, reservation),
+            ReservationDetail.updateOne(
+              { reservationId: oldReservation._id },
+              reservation
+            ),
+            RoomBalance.insertMany(RoomBalanceEntries, { session }),
+          ]);
+        } catch (error) {
+          console.log(error);
+        }
+      } else {
+        try {
+          await Promise.all([
+            Reservation.updateOne({ _id: oldReservation._id }, reservation),
+          ]);
+        } catch (error) {
+          console.log(error);
+        }
       }
 
       data = {};

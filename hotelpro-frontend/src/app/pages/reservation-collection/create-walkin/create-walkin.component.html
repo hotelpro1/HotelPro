@@ -140,11 +140,11 @@
             class="link text-primary"
             (click)="openExtraModal(extraGuests, room)"
           >
-            {{
-              room.extraAdults == 0 && room.extraChilds == 0
-                ? "add"
-                : "(" + room.extraAdults + "/" + room.extraChilds + ")"
-            }}
+            @if( room.extraAdults == 0 && room.extraChilds == 0 ){
+            <i class="material-symbols-rounded">person_add</i>
+            }@else {
+            {{ "(" + room.extraAdults + "/" + room.extraChilds + ")" }}
+            }
           </span>
         </td>
         <td>{{ room?.roomPrice?.toFixed(2) }}</td>

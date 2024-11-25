@@ -41,6 +41,7 @@ export class ClientDashboardComponent {
       .post(APIConstant.READ_CLIENT_DASHBOARD, obj)
       .then((response: any) => {
         this.dashboardData = response.data;
+        this.activePropertyUnit = 0;
         for (let p of this.dashboardData?.property?.propertyUnits) {
           this.activePropertyUnit += p.active == true ? 1 : 0;
         }
@@ -88,6 +89,7 @@ export class ClientDashboardComponent {
           }
         }
         this.userService.updateUserInfo(userData);
+        this.ngOnInit();
       })
       .catch((error) => {
         this.alertService.errorAlert(error?.error?.message || error.message);

@@ -49,6 +49,7 @@ export class TapeChartComponent {
   selectedItems: any = [];
   Max!: any;
   Today!: any;
+  unAssignReservations: any[] = [];
 
   constructor(
     private crudService: CrudService,
@@ -58,7 +59,7 @@ export class TapeChartComponent {
     private activeRoute: ActivatedRoute,
     private modalService: NgbModal,
     private authService: AuthService
-  ) { }
+  ) {}
 
   ngOnInit() {
     this.propertyUnitId = this.authService.getUserInfo()?.user?.propertyUnitId;
@@ -100,9 +101,8 @@ export class TapeChartComponent {
       d < new Date(this.endDate);
       d.setDate(d.getDate() + 1)
     ) {
-      this.DateArr.push(new Date(d));
+      this.DateArr.push({ date: new Date(d) });
     }
-
 
     const payloadStartDate = this.startDate.toLocaleDateString('en-CA'); // "yyyy-mm-dd"
     const payloadEndDate = this.endDate.toLocaleDateString('en-CA');
@@ -115,8 +115,15 @@ export class TapeChartComponent {
       })
       .then((response: any) => {
         this.dropdownList = [];
-        this.RoomData = this.roomSort(response.data);
+        this.RoomData = this.roomSort(response.data.tapechartData);
+        this.unAssignReservations = response.data.unAssignReservations;
 
+        this.DateArr.forEach((d: any) => {
+          let r = this.unAssignReservations.filter((u) => {
+            return new Date(u.arrival).toISOString() == d.date.toISOString();
+          });
+          d.unAssignRooms = r;
+        });
         for (let r of this.RoomData) {
           for (let room of r.roomDetails) {
             for (let rr of room.reservation) {
