@@ -113,9 +113,9 @@
               Make Refund
             </label>
             <label class="form-label fw-semibold mt-2 link">View Logs</label>
-            <label class="form-label fw-semibold mt-2 link"
+            <!-- <label class="form-label fw-semibold mt-2 link"
               >Cancel Reservations</label
-            >
+            > -->
             <label
               class="form-label fw-semibold mt-2 link"
               (click)="openAddRoomModal(addRoomModal)"
@@ -420,7 +420,7 @@
   </div>
   <div class="col-md-3 col-12">
     <div class="card container_form p-3 m-2 rounded">
-      <label class="form-label fw-semibold">Reservation Summary</label>
+      <label class="form-label fw-semibold">Room Summary</label>
       <div class="card-body pt-2">
         <label class="form-label">
           Adults/Children:
@@ -904,7 +904,7 @@
       <div class="col-md-3 mt-3">
         <label class="form-label">Remark</label>
         <input
-          type="number"
+          type="text"
           class="form-control"
           formControlName="remark"
           placeholder="Enter Remark"

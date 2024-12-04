@@ -73,10 +73,6 @@ const getTapechart = asyncHandler(async (req, res) => {
                                 reservationStatus:
                                   ReservationStatusEnum.RESERVED,
                               },
-                              {
-                                reservationStatus:
-                                  ReservationStatusEnum.CHECKEDOUT,
-                              },
                             ],
                           },
                         ],

@@ -113,7 +113,6 @@ const getDateWiseRoomAvailability = async (
                   $or: [
                     { reservationStatus: ReservationStatusEnum.RESERVED },
                     { reservationStatus: ReservationStatusEnum.INHOUSE },
-                    { reservationStatus: ReservationStatusEnum.CHECKEDOUT },
                   ],
                 },
               ],
