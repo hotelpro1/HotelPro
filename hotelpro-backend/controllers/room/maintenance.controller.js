@@ -82,7 +82,6 @@ const getRoomMaintenance = asyncHandler(async (req, res) => {
               $or: [
                 { reservationStatus: ReservationStatusEnum.INHOUSE },
                 { reservationStatus: ReservationStatusEnum.RESERVED },
-                { reservationStatus: ReservationStatusEnum.CHECKEDOUT },
               ],
             },
           ],
