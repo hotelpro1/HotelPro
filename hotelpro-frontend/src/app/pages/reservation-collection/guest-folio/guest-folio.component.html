@@ -17,6 +17,7 @@
           class="material-symbols-rounded mt-2"
           style="vertical-align: middle"
           aria-label="Print"
+          (click)="printInvoice()"
         >
           print
         </i>
@@ -193,7 +194,7 @@
             {{ reservation?.departure | date }}
           </p>
         </div>
-        <div>
+        <!-- <div>
           <i
             class="material-symbols-rounded mt-2"
             style="vertical-align: middle"
@@ -201,7 +202,7 @@
           >
             print
           </i>
-        </div>
+        </div> -->
       </div>
     </div>
   </div>
@@ -1558,3 +1559,196 @@
     </button>
   </div>
 </ng-template>
+
+<div id="invoice-content" hidden>
+  <div style="width: 100%; font-family: Tahoma !important">
+    <div>
+      <h3 style="margin-bottom: 7px">
+        <b>{{ propertyUnitData.propertyUnitName }}</b>
+      </h3>
+      <p style="margin-top: 5px; margin-bottom: 5px">
+        {{ propertyUnitData.propertyAddress.addressLine1 }}
+        {{ propertyUnitData.propertyAddress.addressLine2 }}
+        {{ propertyUnitData.propertyAddress.city }}
+      </p>
+      <p style="margin-top: 5px; margin-bottom: 5px">
+        Phone: {{ propertyUnitData.managerDetails.phone }};
+      </p>
+      <p style="margin-top: 5px; margin-bottom: 5px">
+        E-mail: {{ propertyUnitData.managerDetails.email }};
+      </p>
+      <hr style="color: black" />
+    </div>
+    <div>
+      <div>
+        <h3 style="margin: 5px; margin-left: 0px">Reservation Invoice</h3>
+      </div>
+      <div style="display: flex; justify-content: space-between">
+        <div style="width: 33%">
+          <table>
+            <tr>
+              <td>Customer Name</td>
+              <td> : </td>
+              <td>
+                {{ groupDetails?.customerDetails?.firstName }}
+                {{ groupDetails?.customerDetails?.lastName }}
+              </td>
+            </tr>
+            <tr>
+              <td>Group No</td>
+              <td> : </td>
+              <td> {{ groupDetails?.groupNumber }} </td>
+            </tr>
+            <tr>
+              <td>Total Rooms</td>
+              <td> : </td>
+              <td>
+                {{ groupDetails?.reservations?.length }}
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div style="width: 33%">
+          <table>
+            <tr>
+              <td>Total Price</td>
+              <td> : </td>
+              <td> {{ groupDetails?.totalPrice | currency }} </td>
+            </tr>
+            <tr>
+              <td>Total Tax</td>
+              <td> : </td>
+              <td> {{ groupDetails?.totalTax | currency }} </td>
+            </tr>
+            <tr>
+              <td>Total Charge</td>
+              <td> : </td>
+              <td> {{ groupDetails?.totalExtraCharge | currency }} </td>
+            </tr>
+            <tr>
+              <td>Total Cost</td>
+              <td> : </td>
+              <td> {{ groupDetails?.totalCost | currency }} </td>
+            </tr>
+          </table>
+        </div>
+        <div style="width: 33%">
+          <table>
+            <tr>
+              <td>Total Payment</td>
+              <td> : </td>
+              <td> {{ groupDetails?.totalPayment | currency }} </td>
+            </tr>
+            <tr>
+              <td>Total Deposit</td>
+              <td> : </td>
+              <td> {{ groupDetails?.totalDeposit | currency }} </td>
+            </tr>
+            <tr>
+              <td>Total Balance</td>
+              <td> : </td>
+              <td> {{ -groupDetails?.totalBalance | currency }} </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+      <hr style="color: black" />
+      @for (reservation of groupDetails?.reservations; track reservation; let i
+      = $index) {
+      <div style="margin-top: 10px">
+        <h3 style="margin: 5px; margin-left: 0px"
+          >Room - {{ i + 1 }} (#{{ reservation.confirmationNumber }})
+        </h3>
+        <div style="display: flex">
+          <div style="width: 33%">
+            <table>
+              <tr>
+                <td>Adults/Children</td>
+                <td>:</td>
+                <td>
+                  {{ reservation?.reservationDetails?.adults }}/{{
+                    reservation?.reservationDetails?.childs
+                  }}
+                </td>
+              </tr>
+              <tr>
+                <td>Room Type </td>
+                <td>:</td>
+                <td>{{ reservation?.roomTypeDetails?.roomTypeName }}</td>
+              </tr>
+              <tr>
+                <td>Room </td>
+                <td>:</td>
+                <td>
+                  {{
+                    reservation?.roomDetails?.roomName
+                      ? reservation?.roomDetails?.roomName
+                      : "unassign"
+                  }}</td
+                >
+              </tr>
+            </table>
+          </div>
+          <div style="width: 33%">
+            <table>
+              <tr>
+                <td>Arrival</td>
+                <td>:</td>
+                <td>
+                  {{ reservation?.arrival | date }}
+                </td>
+              </tr>
+              <tr>
+                <td>Departure</td>
+                <td>:</td>
+                <td>
+                  {{ reservation?.departure | date }}
+                </td>
+              </tr>
+            </table>
+          </div>
+          <div style="width: 33%">
+            <table>
+              <tr>
+                <td>Room Price</td>
+                <td> : </td>
+                <td>
+                  {{ reservation?.reservationDetails?.roomPrice | currency }}
+                </td>
+              </tr>
+              <tr>
+                <td>Charges</td>
+                <td> : </td>
+                <td>
+                  {{
+                    reservation?.reservationDetails?.roomExtraCharge | currency
+                  }}
+                </td>
+              </tr>
+              <tr>
+                <td>Room Cost</td>
+                <td> : </td>
+                <td>
+                  {{ reservation?.reservationDetails?.roomCost | currency }}
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <hr style="color: black" />
+      }
+    </div>
+
+    <hr style="color: black" />
+    <p style="font-size: 12px">
+      &emsp;Only registered guests allowed in the room. Violation of this policy
+      will result in eviction.
+    </p>
+    <p style="font-size: 12px">
+      &emsp;I agree that my liability for this bill is not waived and agree to
+      be held personally liable in the event that the indicated person, company,
+      or association fails to pay the, full amount of these charges.
+    </p>
+  </div>
+</div>
