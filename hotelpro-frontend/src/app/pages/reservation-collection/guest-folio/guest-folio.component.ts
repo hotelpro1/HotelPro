@@ -75,6 +75,7 @@ export class GuestFolioComponent implements OnInit {
   depositObj: any = {};
   cardsArray: any[] = [];
   cardDetails: any = {};
+  propertyUnitData: any = {};
   imageObject = [
     {
       image:
@@ -116,6 +117,7 @@ export class GuestFolioComponent implements OnInit {
     this.groupId = this.route.snapshot.paramMap.get('groupId');
     this.loadGroupDetails();
     this.initializeForms();
+    this.readPropertyunitData();
   }
   private initializeForms() {
     this.paymentForm = this.fb.group({
@@ -143,6 +145,18 @@ export class GuestFolioComponent implements OnInit {
     });
   }
 
+  readPropertyunitData() {
+    this.crudService
+      .post(APIConstant.READ_PROPERTY_UNIT + this.propertyUnitId, {})
+      .then((response: any) => {
+        this.propertyUnitData = response.data;
+        console.log(this.propertyUnitData);
+      })
+      .catch((error) => {
+        this.alertService.errorAlert(error.message);
+      });
+  }
+
   // Load group details
   private loadGroupDetails() {
     if (this.groupId) {
@@ -160,6 +174,7 @@ export class GuestFolioComponent implements OnInit {
         });
     }
   }
+
   updateStay(reservationId: any) {
     const updatePayload = {
       reservationId: reservationId,
@@ -990,5 +1005,23 @@ export class GuestFolioComponent implements OnInit {
         );
         console.error(error);
       });
+  }
+
+  printInvoice(): void {
+    let printContents, popupWin;
+    printContents = document.getElementById('invoice-content')?.innerHTML;
+    popupWin = window.open('', '_blank', 'top=0,left=0,height=100%,width=auto');
+    popupWin?.document.open();
+    popupWin?.document.write(`
+      <html>
+        <head>
+          <title>Reservation Invoice</title>
+          <style>
+          //........Customized style.......
+          </style>
+        </head>
+    <body onload="window.print()">${printContents}</body>
+      </html>`);
+    popupWin?.document.close();
   }
 }

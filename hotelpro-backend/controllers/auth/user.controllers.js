@@ -26,6 +26,7 @@ import { logger } from "../../logger/winston.logger.js";
 // TODO: Add more options to make cookie more secure and reliable
 const options = {
   httpOnly: true,
+  maxAge: 10 * 24 * 60 * 60 * 1000, // 10 days
   secure: process.env.NODE_ENV === "production",
 };
 
@@ -666,7 +667,7 @@ const resendEmailVerification = async (req, res) => {
     });
     return res.render("pages/url_validation", {
       contentType: "Regenerate",
-      content: "We have resent you a link. Please check your email.",
+      content: "We have resend you a link. Please check your email.",
     });
   } catch (error) {
     // Handle any unexpected errors
