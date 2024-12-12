@@ -80,7 +80,7 @@ export class FrontdeskDashboardComponent {
         from: 'dashboard',
       })
       .then((response: any) => {
-        this.roomData = response.data;
+        this.roomData = response.data.tapechartData;
         console.log(this.roomData);
       })
       .catch((error) => {
