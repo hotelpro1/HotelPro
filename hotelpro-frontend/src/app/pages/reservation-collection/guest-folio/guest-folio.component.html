@@ -1567,15 +1567,15 @@
         <b>{{ propertyUnitData.propertyUnitName }}</b>
       </h3>
       <p style="margin-top: 5px; margin-bottom: 5px">
-        {{ propertyUnitData.propertyAddress.addressLine1 }}
-        {{ propertyUnitData.propertyAddress.addressLine2 }}
-        {{ propertyUnitData.propertyAddress.city }}
+        {{ propertyUnitData.propertyAddress?.addressLine1 }}
+        {{ propertyUnitData.propertyAddress?.addressLine2 }}
+        {{ propertyUnitData.propertyAddress?.city }}
       </p>
       <p style="margin-top: 5px; margin-bottom: 5px">
-        Phone: {{ propertyUnitData.managerDetails.phone }};
+        Phone: {{ propertyUnitData.managerDetails?.phone }};
       </p>
       <p style="margin-top: 5px; margin-bottom: 5px">
-        E-mail: {{ propertyUnitData.managerDetails.email }};
+        E-mail: {{ propertyUnitData.managerDetails?.email }};
       </p>
       <hr style="color: black" />
     </div>
