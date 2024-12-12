@@ -107,7 +107,7 @@ export class GuestFolioComponent implements OnInit {
     private crudService: CrudService,
     private modalService: NgbModal,
     private paymentSharedService: PaymentSharedService
-  ) { }
+  ) {}
   ngOnInit(): void {
     let d = new Date();
     this.FormatToday = this.formatDate(d);
@@ -149,7 +149,7 @@ export class GuestFolioComponent implements OnInit {
     this.crudService
       .post(APIConstant.READ_PROPERTY_UNIT + this.propertyUnitId, {})
       .then((response: any) => {
-        this.propertyUnitData = response.data
+        this.propertyUnitData = response.data;
         console.log(this.propertyUnitData);
       })
       .catch((error) => {
@@ -168,7 +168,7 @@ export class GuestFolioComponent implements OnInit {
         .catch((error) => {
           this.alertService.errorAlert(
             error?.error?.message ||
-            'An error occurred while loading group details'
+              'An error occurred while loading group details'
           );
           console.error(error);
         });
@@ -257,7 +257,7 @@ export class GuestFolioComponent implements OnInit {
               .catch((error) => {
                 this.alertService.errorAlert(
                   error?.error?.message ||
-                  'An error occurred while processing the room addition'
+                    'An error occurred while processing the room addition'
                 );
                 console.error(error);
               });
@@ -687,7 +687,7 @@ export class GuestFolioComponent implements OnInit {
               .catch((error) => {
                 this.alertService.errorAlert(
                   error?.error?.message ||
-                  'An error occurred while processing no-show'
+                    'An error occurred while processing no-show'
                 );
                 console.error(error);
               });
@@ -733,7 +733,7 @@ export class GuestFolioComponent implements OnInit {
               .catch((error) => {
                 this.alertService.errorAlert(
                   error?.error?.message ||
-                  'An error occurred while canceling the reservation'
+                    'An error occurred while canceling the reservation'
                 );
                 console.error(error);
               });
@@ -921,7 +921,7 @@ export class GuestFolioComponent implements OnInit {
             .catch((error) => {
               this.alertService.errorAlert(
                 error?.error?.message ||
-                'An error occurred while adding charges'
+                  'An error occurred while adding charges'
               );
               console.error(error);
             });
@@ -933,7 +933,7 @@ export class GuestFolioComponent implements OnInit {
     this.confirmMsg =
       this.groupDetails.totalBalance < 0
         ? `Are you sure want to check out without clearing current outstanding ${-this
-          .groupDetails.totalBalance}`
+            .groupDetails.totalBalance}`
         : 'Are you sure want to check out ?';
     this.openModal(content).then((result) => {
       if (result) {
@@ -1010,16 +1010,12 @@ export class GuestFolioComponent implements OnInit {
   printInvoice(): void {
     let printContents, popupWin;
     printContents = document.getElementById('invoice-content')?.innerHTML;
-    popupWin = window.open(
-      '',
-      '_blank',
-      'top=0,left=0,height=100%,width=auto'
-    );
+    popupWin = window.open('', '_blank', 'top=0,left=0,height=100%,width=auto');
     popupWin?.document.open();
     popupWin?.document.write(`
       <html>
         <head>
-          <title>Reservation Summary</title>
+          <title>Reservation Invoice</title>
           <style>
           //........Customized style.......
           </style>
@@ -1028,5 +1024,4 @@ export class GuestFolioComponent implements OnInit {
       </html>`);
     popupWin?.document.close();
   }
-
 }
