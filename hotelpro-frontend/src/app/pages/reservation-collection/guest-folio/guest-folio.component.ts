@@ -164,6 +164,12 @@ export class GuestFolioComponent implements OnInit {
         .post(APIConstant.GUEST_FOLIO, { groupId: this.groupId })
         .then((response) => {
           this.groupDetails = response.data;
+          this.groupDetails?.reservations.forEach((reservation: any) => {
+            reservation.nights = this.getDiffBetweenDate(
+              reservation?.arrival,
+              reservation?.departure
+            );
+          });
         })
         .catch((error) => {
           this.alertService.errorAlert(
@@ -1005,6 +1011,20 @@ export class GuestFolioComponent implements OnInit {
         );
         console.error(error);
       });
+  }
+
+  getDiffBetweenDate(date1: any, date2: any) {
+    // Define two dates
+    date1 = new Date(date1);
+    date2 = new Date(date2);
+
+    // Calculate the difference in milliseconds
+    const diffInMs = Math.abs(date2 - date1);
+
+    // Convert milliseconds to days
+    const diffInDays = diffInMs / (1000 * 60 * 60 * 24);
+    return diffInDays;
+    console.log(`Difference in days: ${diffInDays}`);
   }
 
   printInvoice(): void {

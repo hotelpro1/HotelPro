@@ -143,28 +143,28 @@
         <label class="form-label">
           Total Price:
           <span class="fw-semibold">{{
-            groupDetails?.totalPrice | currency
+            groupDetails?.totalPrice | currency : "INR"
           }}</span>
         </label>
         <br />
         <label class="form-label">
           Total Tax:
           <span class="fw-semibold">{{
-            groupDetails?.totalTax | currency
+            groupDetails?.totalTax | currency : "INR"
           }}</span>
         </label>
         <br />
         <label class="form-label">
           Total Charge:
           <span class="fw-semibold">{{
-            groupDetails?.totalExtraCharge | currency
+            groupDetails?.totalExtraCharge | currency : "INR"
           }}</span>
         </label>
         <br />
         <label class="form-label">
           Total Cost:
           <span class="fw-semibold">{{
-            groupDetails?.totalCost | currency
+            groupDetails?.totalCost | currency : "INR"
           }}</span>
         </label>
       </div>
@@ -191,7 +191,8 @@
             <i class="material-symbols-rounded" style="vertical-align: middle">
               line_end_arrow_notch
             </i>
-            {{ reservation?.departure | date }}
+            {{ reservation?.departure | date }} (Nights
+            {{ reservation?.nights }})
           </p>
         </div>
         <!-- <div>
@@ -435,22 +436,34 @@
         <label class="form-label">
           Room Price:
           <span class="fw-semibold"
-            >{{ reservation?.reservationDetails?.roomPrice | currency }}
+            >{{ reservation?.reservationDetails?.roomPrice | currency : "INR" }}
           </span></label
         >
         <br />
         <label class="form-label">
           Charges:
           <span class="fw-semibold"
-            >{{ reservation?.reservationDetails?.roomExtraCharge | currency }}
+            >{{
+              reservation?.reservationDetails?.roomExtraCharge
+                | currency : "INR"
+            }}
           </span></label
         >
-
+        <br />
+        <label class="form-label">
+          Tax:
+          <span class="fw-semibold">
+            {{
+              reservation?.reservationDetails?.roomCost -
+                reservation?.reservationDetails?.roomPrice | currency : "INR"
+            }}
+          </span></label
+        >
         <br />
         <label class="form-label">
           Room Cost:
           <span class="fw-semibold"
-            >{{ reservation?.reservationDetails?.roomCost | currency }}
+            >{{ reservation?.reservationDetails?.roomCost | currency : "INR" }}
           </span></label
         >
         <br />
@@ -517,23 +530,36 @@
       <label class="form-label fw-semibold">Payment Summary</label>
       <div class="card-body pt-2">
         <label class="form-label">
+          Total Extra Charge:
+          <span class="fw-semibold">{{
+            groupDetails?.totalExtraCharge | currency : "INR"
+          }}</span>
+        </label>
+        <br />
+        <label class="form-label">
+          Total Cost:
+          <span class="fw-semibold">{{
+            groupDetails?.totalCost | currency : "INR"
+          }}</span>
+        </label>
+        <label class="form-label">
           Total Payment:
           <span class="fw-semibold"
-            >{{ groupDetails?.totalPayment | currency }}
+            >{{ groupDetails?.totalPayment | currency : "INR" }}
           </span></label
         >
         <br />
         <label class="form-label">
           Total Deposit:
           <span class="fw-semibold"
-            >{{ groupDetails?.totalDeposit | currency }}
+            >{{ groupDetails?.totalDeposit | currency : "INR" }}
           </span></label
         >
         <br />
         <label class="form-label">
           Total Balance:
           <span class="fw-semibold"
-            >{{ -groupDetails?.totalBalance | currency }}
+            >{{ -groupDetails?.totalBalance | currency : "INR" }}
           </span></label
         >
       </div>
@@ -1567,15 +1593,15 @@
         <b>{{ propertyUnitData.propertyUnitName }}</b>
       </h3>
       <p style="margin-top: 5px; margin-bottom: 5px">
-        {{ propertyUnitData.propertyAddress.addressLine1 }}
-        {{ propertyUnitData.propertyAddress.addressLine2 }}
-        {{ propertyUnitData.propertyAddress.city }}
+        {{ propertyUnitData?.propertyAddress?.addressLine1 }}
+        {{ propertyUnitData?.propertyAddress?.addressLine2 }}
+        {{ propertyUnitData?.propertyAddress?.city }}
       </p>
       <p style="margin-top: 5px; margin-bottom: 5px">
-        Phone: {{ propertyUnitData.managerDetails.phone }};
+        Phone: {{ propertyUnitData?.managerDetails?.phone }};
       </p>
       <p style="margin-top: 5px; margin-bottom: 5px">
-        E-mail: {{ propertyUnitData.managerDetails.email }};
+        E-mail: {{ propertyUnitData?.managerDetails?.email }};
       </p>
       <hr style="color: black" />
     </div>
@@ -1613,22 +1639,22 @@
             <tr>
               <td>Total Price</td>
               <td> : </td>
-              <td> {{ groupDetails?.totalPrice | currency }} </td>
+              <td> {{ groupDetails?.totalPrice | currency : "INR" }} </td>
             </tr>
             <tr>
               <td>Total Tax</td>
               <td> : </td>
-              <td> {{ groupDetails?.totalTax | currency }} </td>
+              <td> {{ groupDetails?.totalTax | currency : "INR" }} </td>
             </tr>
             <tr>
               <td>Total Charge</td>
               <td> : </td>
-              <td> {{ groupDetails?.totalExtraCharge | currency }} </td>
+              <td> {{ groupDetails?.totalExtraCharge | currency : "INR" }} </td>
             </tr>
             <tr>
               <td>Total Cost</td>
               <td> : </td>
-              <td> {{ groupDetails?.totalCost | currency }} </td>
+              <td> {{ groupDetails?.totalCost | currency : "INR" }} </td>
             </tr>
           </table>
         </div>
@@ -1637,17 +1663,17 @@
             <tr>
               <td>Total Payment</td>
               <td> : </td>
-              <td> {{ groupDetails?.totalPayment | currency }} </td>
+              <td> {{ groupDetails?.totalPayment | currency : "INR" }} </td>
             </tr>
             <tr>
               <td>Total Deposit</td>
               <td> : </td>
-              <td> {{ groupDetails?.totalDeposit | currency }} </td>
+              <td> {{ groupDetails?.totalDeposit | currency : "INR" }} </td>
             </tr>
             <tr>
               <td>Total Balance</td>
               <td> : </td>
-              <td> {{ -groupDetails?.totalBalance | currency }} </td>
+              <td> {{ -groupDetails?.totalBalance | currency : "INR" }} </td>
             </tr>
           </table>
         </div>
@@ -1713,7 +1739,10 @@
                 <td>Room Price</td>
                 <td> : </td>
                 <td>
-                  {{ reservation?.reservationDetails?.roomPrice | currency }}
+                  {{
+                    reservation?.reservationDetails?.roomPrice
+                      | currency : "INR"
+                  }}
                 </td>
               </tr>
               <tr>
@@ -1721,7 +1750,19 @@
                 <td> : </td>
                 <td>
                   {{
-                    reservation?.reservationDetails?.roomExtraCharge | currency
+                    reservation?.reservationDetails?.roomExtraCharge
+                      | currency : "INR"
+                  }}
+                </td>
+              </tr>
+              <tr>
+                <td>Tax</td>
+                <td> : </td>
+                <td>
+                  {{
+                    reservation?.reservationDetails?.roomCost -
+                      reservation?.reservationDetails?.roomPrice
+                      | currency : "INR"
                   }}
                 </td>
               </tr>
@@ -1729,7 +1770,9 @@
                 <td>Room Cost</td>
                 <td> : </td>
                 <td>
-                  {{ reservation?.reservationDetails?.roomCost | currency }}
+                  {{
+                    reservation?.reservationDetails?.roomCost | currency : "INR"
+                  }}
                 </td>
               </tr>
             </table>

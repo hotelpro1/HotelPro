@@ -1,5 +1,5 @@
 <div class="row g-0">
-  <div class="col-9 ps-5 pe-3">
+  <div class="ps-5 pe-3" [class]="!ratePlanId ? 'col-9' : 'col-12'">
     <div class="container container_form my-3 rounded">
       <form [formGroup]="ratePlanForm">
         <div class="row row-cols-1 row-cols-md-2">
@@ -224,6 +224,7 @@
           <div class="col-md-12 mb-2">
             <div class="d-flex justify-content-center">
               <button
+                *ngIf="!ratePlanId"
                 class="btn btn-primary ms-2"
                 type="button"
                 (click)="navigateToRoomSetup()"
@@ -239,6 +240,7 @@
                 Submit
               </button>
               <button
+                *ngIf="!ratePlanId"
                 class="btn btn-primary ms-2"
                 type="button"
                 (click)="next()"
@@ -251,7 +253,7 @@
       </form>
     </div>
   </div>
-  <div class="col-3 px-3">
+  <div class="col-3 px-3" *ngIf="!ratePlanId">
     <app-property-sidebar></app-property-sidebar>
   </div>
 </div>
