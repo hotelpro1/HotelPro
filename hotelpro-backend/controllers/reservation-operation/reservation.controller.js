@@ -958,6 +958,7 @@ const stayUpdate = asyncHandler(async (req, res) => {
               {
                 $set: {
                   roomCost: newRoomCost,
+                  roomPrice: newRoomPrice,
                 },
               },
               session
@@ -1868,6 +1869,7 @@ const guestFolio = asyncHandler(async (req, res) => {
               localField: "_id",
               foreignField: "reservationId",
               as: "roomBalances",
+              pipeline: [{ $sort: { balanceDate: 1 } }],
             },
           },
         ],
