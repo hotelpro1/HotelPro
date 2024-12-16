@@ -1,6 +1,12 @@
 <nav class="navbar navbar-expand-lg bg-body-tertiary custom-bar">
   <div class="container-fluid">
-    <a class="navbar-brand" (click)="gotoDashboard()">Hotel Pro</a>
+    <a class="navbar-brand p-0" (click)="gotoDashboard()"
+      ><img
+        src="../../../assets/images/hotelpro-logo-full-without.png"
+        alt=""
+        srcset=""
+        width="110px"
+    /></a>
     <button
       class="navbar-toggler"
       type="button"
@@ -249,14 +255,14 @@
               class="d-flex justify-content-end m-2"
               style="min-width: 300px"
             >
-              <button
+              <!-- <button
                 type="button"
                 class="btn btn-primary me-1"
                 *ngIf="notifications?.length != 0"
                 (click)="goToPage('view-notification')"
               >
                 View All
-              </button>
+              </button> -->
               <button
                 type="button"
                 class="btn btn-secondary ms-1"
