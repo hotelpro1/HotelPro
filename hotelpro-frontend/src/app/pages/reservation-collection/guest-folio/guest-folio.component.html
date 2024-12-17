@@ -583,6 +583,7 @@
       class="form-control"
       name="updateStayArrival"
       [min]="FormatToday"
+      (input)="setDeparture()"
       [(ngModel)]="updateStayArrival"
       #arrival="ngModel"
       required
@@ -612,7 +613,7 @@
     <button
       type="button"
       class="btn btn-outline-secondary"
-      [disabled]="!checkDate()"
+      [disabled]="checkDate()"
       (click)="modal.close(true)"
     >
       Save

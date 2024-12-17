@@ -206,15 +206,38 @@ export class GuestFolioComponent implements OnInit {
   private formatDate(date: Date): string {
     return new DatePipe('en-US').transform(date, 'yyyy-MM-dd') || '';
   }
+  setDeparture() {
+    if (
+      this.isValidDate(this.updateStayArrival) &&
+      this.isValidDate(this.updateStayDeparture)
+    ) {
+      let date1 = new Date(this.updateStayArrival);
+      let date2 = new Date(this.updateStayDeparture);
+      if (date1 >= date2) {
+        let diff = (date2.getTime() - date1.getTime()) / (1000 * 3600 * 24);
+        diff = diff < 1 ? 1 : Math.round(diff);
+        date1.setDate(date1.getDate() + diff);
+        this.updateStayDeparture = this.formatDate(date1);
+      }
+    }
+  }
   nextDate() {
-    let x = new Date(this.updateStayArrival);
-    x.setDate(x.getDate() + 1);
-    return this.formatDate(x);
+    if (this.isValidDate(this.updateStayArrival)) {
+      let x = new Date(this.updateStayArrival);
+      x.setDate(x.getDate() + 1);
+      return this.formatDate(x);
+    }
+    return this.formatDate(new Date());
   }
   checkDate() {
     return (
-      new Date(this.updateStayArrival) < new Date(this.updateStayDeparture)
+      !this.isValidDate(this.updateStayArrival) ||
+      !this.isValidDate(this.updateStayDeparture) ||
+      new Date(this.updateStayArrival) >= new Date(this.updateStayDeparture)
     );
+  }
+  isValidDate(d: any) {
+    return !Number.isNaN(new Date(d).getTime());
   }
   // Open modal for stay update
   openUpdateStayModal(reservation: any, content: any): void {

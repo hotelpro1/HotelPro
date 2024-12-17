@@ -205,7 +205,7 @@
                   >
                     <div
                       style="text-wrap: pretty"
-                      (click)="goToPage('/create-reservation', n._id)"
+                      (click)="goToPage('/guest-folio/' + n?.groupId, n._id)"
                     >
                       <p class="mb-0">
                         Arrival: {{ n.message?.arrival | date }}=> Departure:{{

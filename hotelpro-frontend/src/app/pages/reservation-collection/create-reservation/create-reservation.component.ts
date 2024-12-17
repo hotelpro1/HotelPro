@@ -14,6 +14,7 @@ import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 import { APIConstant } from '../../../core/constants/APIConstant';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AuthService } from '../../../core/services/auth.service';
+import { distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
   selector: 'app-create-reservation',
@@ -59,6 +60,18 @@ export class CreateReservationComponent implements OnInit {
     // this.propertyUnitId = this.route.snapshot.paramMap.get('propertyUnitId');
     this.initForms();
     this.clearSession();
+    this.groupForm
+      .get('adults')
+      ?.valueChanges.pipe(distinctUntilChanged())
+      .subscribe((adultsValue) => {
+        this.resetGuestTotals();
+      });
+    this.groupForm
+      .get('childs')
+      ?.valueChanges.pipe(distinctUntilChanged())
+      .subscribe((childsValue) => {
+        this.resetGuestTotals();
+      });
   }
 
   private clearSession(): void {

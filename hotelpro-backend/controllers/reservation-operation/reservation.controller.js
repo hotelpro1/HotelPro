@@ -436,19 +436,18 @@ const createReservation = asyncHandler(async (req, res) => {
             roomId: reservationObj.roomId,
           });
           RoomBalanceEntries.push(rb);
-
+          let t = -roundNumber(
+            ((rate.baseRate +
+              reservation.extraAdults * rate.adultRate +
+              reservation.extraChilds * rate.childRate) *
+              reservation.taxPercentage) /
+              100
+          );
           let rbtax = new RoomBalance({
             balanceDate: rate.date,
             reservationId: reservationObj._id,
             balanceName: BalanceNameEnum.TAX,
-            balance:
-              (-(
-                rate.baseRate +
-                reservation.extraAdults * rate.adultRate +
-                reservation.extraChilds * rate.childRate
-              ) *
-                reservation.taxPercentage) /
-              100,
+            balance: t,
             roomId: reservationObj.roomId,
           });
           RoomBalanceEntries.push(rbtax);
@@ -897,9 +896,10 @@ const stayUpdate = asyncHandler(async (req, res) => {
               balanceDate: rate.date,
               reservationId: OldReservationDetails._id,
               balanceName: BalanceNameEnum.TAX,
-              balance:
+              balance: roundNumber(
                 (-rate.baseRate * Number(OldReservationDetails.taxPercentage)) /
-                100,
+                  100
+              ),
               roomId: OldReservationDetails.roomId,
             });
             newRoomCost += rbtax.balance;
@@ -918,12 +918,15 @@ const stayUpdate = asyncHandler(async (req, res) => {
           groupDetails.totalCost +
           newRoomCost -
           OldReservationDetails.reservationDetails.roomCost;
-        let gp =
+        let gp = roundNumber(
           groupDetails.totalPrice +
-          newRoomPrice -
-          OldReservationDetails.reservationDetails.roomCost /
-            (1 + Number(OldReservationDetails.taxPercentage) / 100);
-        let gtax = (gp * Number(OldReservationDetails.taxPercentage)) / 100;
+            newRoomPrice -
+            OldReservationDetails.reservationDetails.roomCost /
+              (1 + Number(OldReservationDetails.taxPercentage) / 100)
+        );
+        let gtax = roundNumber(
+          (gp * Number(OldReservationDetails.taxPercentage)) / 100
+        );
 
         try {
           console.log("Saving  entries...");
@@ -1158,9 +1161,10 @@ const stayUpdate = asyncHandler(async (req, res) => {
               balanceDate: rate.date,
               reservationId: OldReservationDetails._id,
               balanceName: BalanceNameEnum.TAX,
-              balance:
+              balance: roundNumber(
                 (-rate.baseRate * Number(OldReservationDetails.taxPercentage)) /
-                100,
+                  100
+              ),
               roomId: OldReservationDetails.roomId,
             });
             newRoomCost += rbtax.balance;
@@ -1172,19 +1176,24 @@ const stayUpdate = asyncHandler(async (req, res) => {
         newRoomPrice = -newRoomPrice;
         newRoomTax = -newRoomTax;
 
-        let gb =
+        let gb = roundNumber(
           groupDetails.totalBalance -
-          (newRoomCost - OldReservationDetails.reservationDetails.roomCost);
-        let gt =
+            (newRoomCost - OldReservationDetails.reservationDetails.roomCost)
+        );
+        let gt = roundNumber(
           groupDetails.totalCost +
-          newRoomCost -
-          OldReservationDetails.reservationDetails.roomCost;
-        let gp =
+            newRoomCost -
+            OldReservationDetails.reservationDetails.roomCost
+        );
+        let gp = roundNumber(
           groupDetails.totalPrice +
-          newRoomPrice -
-          OldReservationDetails.reservationDetails.roomCost /
-            (1 + Number(OldReservationDetails.taxPercentage) / 100);
-        let gtax = (gp * Number(OldReservationDetails.taxPercentage)) / 100;
+            newRoomPrice -
+            OldReservationDetails.reservationDetails.roomCost /
+              (1 + Number(OldReservationDetails.taxPercentage) / 100)
+        );
+        let gtax = roundNumber(
+          (gp * Number(OldReservationDetails.taxPercentage)) / 100
+        );
 
         try {
           console.log("Saving  entries...");
@@ -1218,6 +1227,7 @@ const stayUpdate = asyncHandler(async (req, res) => {
               {
                 $set: {
                   roomCost: newRoomCost,
+                  roomPrice: newRoomPrice,
                 },
               },
               session
@@ -2170,14 +2180,15 @@ const addRoomReservation = asyncHandler(async (req, res) => {
           balanceDate: rate.date,
           reservationId: reservationObj._id,
           balanceName: BalanceNameEnum.TAX,
-          balance:
+          balance: roundNumber(
             (-(
               rate.baseRate +
               reservation.extraAdults * rate.adultRate +
               reservation.extraChilds * rate.childRate
             ) *
               reservation.taxPercentage) /
-            100,
+              100
+          ),
           roomId: reservationObj.roomId,
         });
         gt.totalTax += -rbtax.balance;
@@ -2468,14 +2479,16 @@ const changeRoomReservation = asyncHandler(async (req, res) => {
         let gt = {
           totalCost: -oldReservation.reservationDetails.roomCost,
           totalBalance: oldReservation.reservationDetails.roomCost,
-          totalPrice:
+          totalPrice: roundNumber(
             -oldReservation.reservationDetails.roomCost /
-            (1 + Number(oldReservation.taxPercentage) / 100),
+              (1 + Number(oldReservation.taxPercentage) / 100)
+          ),
           totalTax: 0,
         };
 
-        gt.totalTax =
-          (gt.totalPrice * Number(oldReservation.taxPercentage)) / 100;
+        gt.totalTax = roundNumber(
+          (gt.totalPrice * Number(oldReservation.taxPercentage)) / 100
+        );
 
         reservation.dateRate.forEach((rate) => {
           let rb = new RoomBalance({
@@ -2495,14 +2508,15 @@ const changeRoomReservation = asyncHandler(async (req, res) => {
             balanceDate: rate.date,
             reservationId: oldReservation._id,
             balanceName: BalanceNameEnum.TAX,
-            balance:
+            balance: roundNumber(
               (-(
                 rate.baseRate +
                 reservation.extraAdults * rate.adultRate +
                 reservation.extraChilds * rate.childRate
               ) *
                 reservation.taxPercentage) /
-              100,
+                100
+            ),
             roomId: reservation.roomId,
           });
           gt.totalTax += -rbtax.balance;
@@ -2648,6 +2662,10 @@ const unassignRoom = asyncHandler(async (req, res) => {
     .status(201)
     .json(new ApiResponse(201, data, "Unassigned room successfully!"));
 });
+
+const roundNumber = (n) => {
+  return Math.round(n * 100) / 100;
+};
 
 export default {
   getAllReservations,

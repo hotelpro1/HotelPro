@@ -245,28 +245,31 @@ export class ReservationInfoComponent implements OnInit {
 
         this.reservations.at(index).patchValue(this.updateDateRateObj);
         this.groupForm.controls.totalCost.patchValue(
-          this.groupForm.controls.totalCost.value -
-            oldObj.roomCost +
-            this.updateDateRateObj.roomCost
+          this.roundNumber(
+            this.groupForm.controls.totalCost.value -
+              oldObj.roomCost +
+              this.updateDateRateObj.roomCost
+          )
         );
         this.groupForm.controls.totalPrice.patchValue(
-          this.groupForm.controls.totalPrice.value -
-            oldObj.roomPrice +
-            this.updateDateRateObj.roomPrice
+          this.roundNumber(
+            this.groupForm.controls.totalPrice.value -
+              oldObj.roomPrice +
+              this.updateDateRateObj.roomPrice
+          )
         );
       }
     });
   }
 
   calculateRate(): void {
-    this.updateDateRateObj.roomPrice =
-      Math.round((this.updateDateRateObj.roomCost / 1.11) * 100) / 100;
-    const onlyRoomCharges =
-      Math.round(
-        (this.updateDateRateObj.roomPrice /
-          this.updateDateRateObj.dateRate.length) *
-          100
-      ) / 100;
+    this.updateDateRateObj.roomPrice = this.roundNumber(
+      this.updateDateRateObj.roomCost /
+        (1 + this.updateDateRateObj.taxPercentage / 100)
+    );
+    const onlyRoomCharges = this.roundNumber(
+      this.updateDateRateObj.roomPrice / this.updateDateRateObj.dateRate.length
+    );
     this.updateDateRateObj.dateRate.forEach((r: any) => {
       r.baseRate = onlyRoomCharges;
     });
@@ -296,9 +299,10 @@ export class ReservationInfoComponent implements OnInit {
           reservationsArray: this.reservationForm.get('reservations')?.value,
           groupDetails: {
             ...this.groupForm.value,
-            totalTax:
+            totalTax: this.roundNumber(
               this.groupForm.get('totalCost')?.value -
-              this.groupForm.get('totalPrice')?.value,
+                this.groupForm.get('totalPrice')?.value
+            ),
             totalBalance: -this.groupForm.get('totalCost')?.value,
             totalPayment: 0,
             totalDeposit: 0,
@@ -427,5 +431,9 @@ export class ReservationInfoComponent implements OnInit {
 
   fileLeave(event: any) {
     console.log(event);
+  }
+
+  roundNumber(n: any) {
+    return Math.round(n * 100) / 100;
   }
 }
