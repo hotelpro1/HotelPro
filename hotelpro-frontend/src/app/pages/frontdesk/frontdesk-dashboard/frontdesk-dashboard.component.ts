@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { CommonModule, DatePipe } from '@angular/common';
+import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 
 import { AuthService } from '../../../core/services/auth.service';
 import { CrudService } from '../../../core/services/crud.service';
@@ -10,7 +10,7 @@ import { AlertService } from '../../../core/services/alert.service';
 @Component({
   selector: 'app-frontdesk-dashboard',
   standalone: true,
-  imports: [DatePipe],
+  imports: [DatePipe, CurrencyPipe],
   templateUrl: './frontdesk-dashboard.component.html',
   styleUrl: './frontdesk-dashboard.component.css',
 })
